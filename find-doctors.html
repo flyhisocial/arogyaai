@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArogyaAI — Find Doctors Near You</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0A7B5E;--teal-d:#054D3B;--teal-m:#1D9E75;--teal-l:#5DCAA5;
+  --teal-bg:#E0F2EB;--teal-glow:rgba(10,123,94,0.15);
+  --ink:#080E0B;--ink2:#2A3530;--ink3:#4E5F58;--ink4:#7D9088;
+  --cream:#F6F3EE;--cream2:#EDE9E2;--white:#fff;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.13);
+  --blue:#1A5CB8;--blue-bg:#EBF2FF;
+  --amber:#B87314;--amber-bg:#FFF4E0;
+  --green:#2A7A3A;--green-bg:#E8F5EC;
+  --coral:#C03B2A;--coral-bg:#FDECEA;
+  --purple:#5B3FBE;--purple-bg:#EEE9FF;
+  --shadow:0 2px 8px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.1),0 2px 8px rgba(0,0,0,0.06);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Sora',sans-serif}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;background:none}
+input,select,textarea{font-family:'DM Sans',sans-serif}
+
+/* ── NAV ── */
+.nav{height:56px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;position:relative;z-index:50}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--teal);text-decoration:none}
+.logo-box{width:30px;height:30px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-back{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink3);background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:6px 12px;transition:all 0.15s;text-decoration:none}
+.nav-back:hover{color:var(--teal);border-color:var(--teal)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-avi{width:32px;height:32px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;font-family:'Sora',sans-serif}
+
+/* ── APP SHELL ── */
+.app{display:flex;flex-direction:column;height:100vh}
+.main{display:flex;flex:1;overflow:hidden}
+
+/* ── LEFT PANEL ── */
+.left-panel{width:420px;flex-shrink:0;display:flex;flex-direction:column;background:var(--white);border-right:1px solid var(--border);overflow:hidden}
+
+/* SEARCH BAR */
+.search-bar{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.search-wrap{position:relative;display:flex;align-items:center;gap:8px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;color:var(--ink4)}
+.search-input{width:100%;padding:10px 40px 10px 36px;border:1.5px solid var(--border2);border-radius:10px;font-size:14px;color:var(--ink);background:var(--cream);outline:none;transition:border 0.2s,box-shadow 0.2s}
+.search-input:focus{border-color:var(--teal-m);background:var(--white);box-shadow:0 0 0 3px var(--teal-glow)}
+.search-input::placeholder{color:var(--ink4)}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--ink4);border:none;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;color:#fff;font-size:11px;cursor:pointer}
+.search-clear.show{display:flex}
+
+/* FILTERS */
+.filters{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border2);font-size:12px;font-weight:500;color:var(--ink3);white-space:nowrap;cursor:pointer;transition:all 0.15s;flex-shrink:0;background:var(--white)}
+.filter-chip:hover{border-color:var(--teal-m);color:var(--teal)}
+.filter-chip.active{background:var(--teal);border-color:var(--teal);color:#fff}
+.filter-chip .fc-icon{font-size:13px}
+
+/* LOCATION BAR */
+.loc-bar{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--teal-bg)}
+.loc-icon{font-size:16px;color:var(--teal)}
+.loc-text{flex:1;font-size:13px;font-weight:500;color:var(--teal-d)}
+.loc-city{font-size:11px;color:var(--ink3);margin-top:1px}
+.loc-change{font-size:12px;font-weight:600;color:var(--teal);background:var(--white);border:1px solid var(--teal-m);border-radius:7px;padding:4px 10px;transition:all 0.15s}
+.loc-change:hover{background:var(--teal);color:#fff}
+
+/* CITY SWITCHER */
+.city-bar{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.city-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.city-scroll::-webkit-scrollbar{display:none}
+.city-btn{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px;border-radius:12px;border:1.5px solid var(--border);font-size:11px;font-weight:600;color:var(--ink3);white-space:nowrap;cursor:pointer;transition:all 0.15s;flex-shrink:0;background:var(--white);text-align:center}
+.city-btn .city-icon{font-size:16px;margin-bottom:2px}
+.city-btn:hover{border-color:var(--teal-m);color:var(--teal)}
+.city-btn.active{background:var(--teal-bg);border-color:var(--teal);color:var(--teal)}
+.city-btn .nearby-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;position:absolute;top:4px;right:4px}
+
+/* RESULTS HEADER */
+.results-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.results-count{font-size:13px;font-weight:600;color:var(--ink2)}
+.results-count span{color:var(--teal)}
+.sort-select{padding:5px 10px;border:1px solid var(--border2);border-radius:8px;font-size:12px;color:var(--ink2);background:var(--white);outline:none;cursor:pointer}
+
+/* DOCTOR LIST */
+.doc-list{flex:1;overflow-y:auto;padding:10px}
+.doc-list::-webkit-scrollbar{width:4px}
+.doc-list::-webkit-scrollbar-track{background:transparent}
+.doc-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* DOCTOR CARD */
+.doc-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.doc-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background 0.2s;border-radius:3px 0 0 3px}
+.doc-card:hover{border-color:var(--teal-m);box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+.doc-card:hover::before{background:var(--teal-m)}
+.doc-card.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-glow)}
+.doc-card.selected::before{background:var(--teal)}
+
+.dc-top{display:flex;gap:12px;align-items:flex-start}
+.dc-avi{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;position:relative}
+.online-ring{position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;border:2px solid var(--white);display:flex;align-items:center;justify-content:center}
+.dc-info{flex:1;min-width:0}
+.dc-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:1px}
+.dc-spec{font-size:12px;color:var(--teal);font-weight:500;margin-bottom:4px}
+.dc-qual{font-size:11px;color:var(--ink3)}
+.dc-meta{display:flex;gap:10px;margin-top:5px;flex-wrap:wrap}
+.dc-meta-i{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--ink4)}
+.dc-fee-wrap{text-align:right;flex-shrink:0}
+.dc-fee{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--teal)}
+.dc-fee-lbl{font-size:10px;color:var(--ink4)}
+.dc-rating{font-size:11px;color:var(--amber);font-weight:600;margin-top:2px}
+
+.dc-bottom{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.dc-loc{display:flex;align-items:center;gap:5px;flex:1;font-size:11px;color:var(--ink3)}
+.dc-dist{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.dc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.dc-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+
+.dc-actions{display:flex;gap:6px;margin-top:10px}
+.btn-book{flex:1;padding:8px;border-radius:9px;background:var(--teal);color:#fff;font-size:12px;font-weight:600;transition:all 0.15s;border:none}
+.btn-book:hover{background:var(--teal-d)}
+.btn-tele{flex:1;padding:8px;border-radius:9px;background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:600;transition:all 0.15s;border:1px solid rgba(26,92,184,0.2)}
+.btn-tele:hover{background:var(--blue);color:#fff}
+.btn-tele.disabled{background:var(--cream2);color:var(--ink4);border-color:var(--border);cursor:not-allowed;opacity:0.6}
+.btn-chat{padding:8px 10px;border-radius:9px;background:var(--purple-bg);color:var(--purple);font-size:12px;font-weight:600;transition:all 0.15s;border:1px solid rgba(91,63,190,0.15)}
+.btn-chat:hover{background:var(--purple);color:#fff}
+
+/* STATUS BADGES */
+.status-avail{background:var(--green-bg);color:var(--green)}
+.status-busy{background:var(--amber-bg);color:var(--amber)}
+.status-away{background:var(--coral-bg);color:var(--coral)}
+.tele-badge{background:var(--blue-bg);color:var(--blue)}
+.clinic-badge{background:var(--green-bg);color:var(--green)}
+.home-badge{background:var(--purple-bg);color:var(--purple)}
+
+/* ── RIGHT PANEL (MAP + DETAIL) ── */
+.right-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* MAP */
+.map-area{flex:1;position:relative;background:#E8F0E4;overflow:hidden;min-height:0}
+.map-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#D4E8D4 0%,#C8DFCA 50%,#D0E5D0 100%);position:relative;overflow:hidden}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.3) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.3) 1px,transparent 1px);background-size:48px 48px}
+.map-road-h{position:absolute;background:rgba(255,255,255,0.7);height:8px;border-radius:4px}
+.map-road-v{position:absolute;background:rgba(255,255,255,0.7);width:8px;border-radius:4px}
+
+/* MAP PINS */
+.map-pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;z-index:10;transition:all 0.2s}
+.map-pin:hover{z-index:20;transform:translate(-50%,-100%) scale(1.1)}
+.map-pin.selected{z-index:30;transform:translate(-50%,-100%) scale(1.15)}
+.pin-bubble{background:var(--white);border-radius:12px;padding:8px 12px;box-shadow:0 4px 16px rgba(0,0,0,0.15),0 1px 4px rgba(0,0,0,0.1);border:2px solid var(--border);display:flex;align-items:center;gap:7px;white-space:nowrap;transition:all 0.2s;position:relative}
+.pin-bubble::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid var(--white)}
+.pin-bubble::before{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:9px solid var(--border)}
+.map-pin.selected .pin-bubble{border-color:var(--teal);background:var(--teal);color:#fff}
+.map-pin.selected .pin-bubble::after{border-top-color:var(--teal)}
+.map-pin.selected .pin-bubble::before{border-top-color:var(--teal-d)}
+.map-pin.selected .pin-price,.map-pin.selected .pin-name{color:#fff}
+.pin-avi{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.pin-name{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--ink)}
+.pin-price{font-size:11px;color:var(--teal);font-weight:600}
+.pin-dot{width:5px;height:5px;border-radius:50)}
+
+/* MY LOCATION PIN */
+.my-pin{position:absolute;transform:translate(-50%,-50%);z-index:25}
+.my-pin-inner{width:16px;height:16px;border-radius:50%;background:#2563EB;border:3px solid var(--white);box-shadow:0 0 0 6px rgba(37,99,235,0.2);animation:mypulse 2s infinite}
+@keyframes mypulse{0%,100%{box-shadow:0 0 0 6px rgba(37,99,235,0.15)}50%{box-shadow:0 0 0 12px rgba(37,99,235,0.05)}}
+
+/* MAP CONTROLS */
+.map-controls{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:20}
+.map-ctrl{width:36px;height:36px;background:var(--white);border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;box-shadow:var(--shadow);transition:all 0.15s}
+.map-ctrl:hover{background:var(--teal-bg);border-color:var(--teal-m)}
+
+.map-legend{position:absolute;bottom:12px;left:12px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);z-index:20;display:flex;flex-direction:column;gap:6px}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink3)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+.map-search-here{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:var(--white);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--ink2);box-shadow:var(--shadow);cursor:pointer;z-index:20;display:flex;align-items:center;gap:6px;transition:all 0.2s}
+.map-search-here:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* DOCTOR DETAIL PANEL */
+.detail-panel{height:300px;flex-shrink:0;border-top:1px solid var(--border);background:var(--white);overflow:hidden;transition:height 0.3s ease;display:flex;flex-direction:column}
+.detail-panel.collapsed{height:0}
+.detail-inner{flex:1;overflow-y:auto;padding:16px 20px}
+.detail-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.detail-avi{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}
+.detail-info{flex:1}
+.detail-name{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.detail-spec{font-size:13px;color:var(--teal);font-weight:600;margin-bottom:4px}
+.detail-qual{font-size:12px;color:var(--ink3)}
+.detail-rating{display:flex;align-items:center;gap:8px;margin-top:6px}
+.stars{color:#F59E0B;font-size:14px}
+.detail-close{width:30px;height:30px;border-radius:8px;background:var(--cream2);border:none;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink3);cursor:pointer;flex-shrink:0}
+.detail-close:hover{background:var(--border);color:var(--ink)}
+
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.dg-item{background:var(--cream);border-radius:10px;padding:10px;text-align:center;border:1px solid var(--border)}
+.dg-val{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.dg-lbl{font-size:10px;color:var(--ink4)}
+
+.slots-label{font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:8px}
+.slots-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.slot{padding:5px 11px;border-radius:7px;border:1.5px solid var(--border2);font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all 0.15s;background:var(--white)}
+.slot:hover{border-color:var(--teal-m);color:var(--teal)}
+.slot.sel{background:var(--teal);border-color:var(--teal);color:#fff}
+.slot.busy{background:var(--cream2);border-color:var(--border);color:var(--ink4);cursor:not-allowed;text-decoration:line-through}
+
+.detail-actions{display:flex;gap:8px}
+.dbtn-book{flex:2;padding:11px;border-radius:10px;background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;border:none;transition:all 0.2s;cursor:pointer}
+.dbtn-book:hover{background:var(--teal-d);box-shadow:0 6px 18px rgba(10,123,94,0.3)}
+.dbtn-tele{flex:2;padding:11px;border-radius:10px;background:var(--blue-bg);color:var(--blue);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;border:1.5px solid rgba(26,92,184,0.2);transition:all 0.2s;cursor:pointer}
+.dbtn-tele:hover{background:var(--blue);color:#fff}
+.dbtn-tele.off{background:var(--cream2);color:var(--ink4);border-color:var(--border);cursor:not-allowed}
+.dbtn-ai{flex:1;padding:11px;border-radius:10px;background:var(--purple-bg);color:var(--purple);font-family:'Sora',sans-serif;font-size:13px;font-weight:700;border:1.5px solid rgba(91,63,190,0.15);transition:all 0.2s;cursor:pointer}
+.dbtn-ai:hover{background:var(--purple);color:#fff}
+
+/* AI CHAT OVERLAY */
+.chat-overlay{position:fixed;bottom:0;right:0;width:380px;background:var(--white);border-radius:20px 20px 0 0;border:1px solid var(--border);box-shadow:0 -8px 40px rgba(0,0,0,0.12);z-index:200;display:none;flex-direction:column;max-height:520px}
+.chat-overlay.open{display:flex}
+.chat-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-havi{width:36px;height:36px;border-radius:10px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px}
+.chat-hname{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--ink)}
+.chat-hsub{font-size:11px;color:var(--teal);display:flex;align-items:center;gap:4px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;animation:ldot 1.5s infinite}
+@keyframes ldot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+.chat-close{margin-left:auto;width:28px;height:28px;border-radius:7px;background:var(--cream2);border:none;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink3);cursor:pointer}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:200px}
+.chat-msgs::-webkit-scrollbar{width:3px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.cmsg{max-width:85%}
+.cmsg.ai{align-self:flex-start}
+.cmsg.user{align-self:flex-end}
+.cbub{padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55}
+.cmsg.ai .cbub{background:var(--cream);border:1px solid var(--border);color:var(--ink2);border-radius:4px 12px 12px 12px}
+.cmsg.user .cbub{background:var(--teal);color:#fff;border-radius:12px 4px 12px 12px}
+.cqk{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.cq{padding:5px 10px;border-radius:20px;border:1px solid var(--border2);font-size:11px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all 0.15s;background:var(--white)}
+.cq:hover{border-color:var(--teal-m);color:var(--teal)}
+.typing-row{display:flex;gap:3px;padding:8px 12px;background:var(--cream);border-radius:4px 12px 12px 12px;width:fit-content;border:1px solid var(--border)}
+.td{width:5px;height:5px;border-radius:50%;background:var(--ink4);animation:tdot 1.2s infinite}
+.td:nth-child(2){animation-delay:0.2s}.td:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-4px);opacity:1}}
+.chat-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0}
+.chat-inp{flex:1;border:1.5px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;outline:none;background:var(--cream);color:var(--ink);transition:border 0.15s}
+.chat-inp:focus{border-color:var(--teal-m);background:var(--white)}
+.chat-send{width:36px;height:36px;border-radius:9px;background:var(--teal);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s}
+.chat-send:hover{background:var(--teal-d)}
+
+/* BOOKING MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:300;display:none;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--white);border-radius:20px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.2);animation:mslide 0.25s ease}
+@keyframes mslide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mhead{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.mhead h3{font-family:'Sora',sans-serif;font-size:18px;font-weight:700}
+.mclose{width:30px;height:30px;border-radius:8px;background:var(--cream2);border:none;font-size:16px;color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mclose:hover{background:var(--border);color:var(--ink)}
+.mbody{padding:16px 24px 24px}
+.mrow{display:flex;gap:12px;margin-bottom:12px}
+.mfield{flex:1}
+.mfield label{display:block;font-size:12px;font-weight:500;color:var(--ink3);margin-bottom:5px}
+.mfield input,.mfield select,.mfield textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;color:var(--ink);background:var(--cream);outline:none;transition:border 0.2s}
+.mfield input:focus,.mfield select:focus,.mfield textarea:focus{border-color:var(--teal-m);background:var(--white)}
+.mfield textarea{resize:vertical;min-height:70px}
+.msummary{background:var(--teal-bg);border-radius:12px;padding:14px;margin-bottom:16px;border:1px solid rgba(10,123,94,0.15)}
+.ms-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px}
+.ms-row:last-child{margin-bottom:0;padding-top:8px;border-top:1px solid rgba(10,123,94,0.15);font-weight:700}
+.ms-lbl{color:var(--ink3)}
+.ms-val{color:var(--ink2);font-weight:500}
+.mbtn{width:100%;padding:13px;border-radius:11px;background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;margin-top:4px}
+.mbtn:hover{background:var(--teal-d);box-shadow:0 8px 20px rgba(10,123,94,0.3)}
+.mbtn-tele{background:var(--blue);margin-top:8px}
+.mbtn-tele:hover{background:#1345A0;box-shadow:0 8px 20px rgba(26,92,184,0.3)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:500;transition:transform 0.3s ease;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* NO RESULTS */
+.no-results{padding:40px 20px;text-align:center;color:var(--ink4)}
+.no-results .nr-icon{font-size:40px;margin-bottom:12px}
+.no-results p{font-size:14px;line-height:1.6}
+
+/* LOADING */
+.loading-shimmer{background:linear-gradient(90deg,var(--cream) 0%,var(--cream2) 50%,var(--cream) 100%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- NAV -->
+  <div class="nav">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v5M9.5 5.5h5M7 13c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="13" r="2.5" fill="#fff"/></svg>
+      </div>
+      ArogyaAI
+    </a>
+    <a href="index.html" class="nav-back">← Back to home</a>
+    <div class="nav-r">
+      <div style="font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:5px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>
+        Using your location
+      </div>
+      <div class="nav-avi">RK</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+
+      <!-- SEARCH -->
+      <div class="search-bar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" id="search-inp" placeholder="Search doctor, specialty, clinic..." oninput="handleSearch(this.value)">
+          <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="filters">
+        <div class="filter-row" id="filter-row">
+          <div class="filter-chip active" onclick="setFilter('all',this)"><span class="fc-icon">🏥</span> All</div>
+          <div class="filter-chip" onclick="setFilter('available',this)"><span class="fc-icon">✅</span> Available Now</div>
+          <div class="filter-chip" onclick="setFilter('tele',this)"><span class="fc-icon">📹</span> Tele-consult</div>
+          <div class="filter-chip" onclick="setFilter('clinic',this)"><span class="fc-icon">🏨</span> Clinic Visit</div>
+          <div class="filter-chip" onclick="setFilter('home',this)"><span class="fc-icon">🏠</span> Home Visit</div>
+          <div class="filter-chip" onclick="setFilter('genmedicine',this)"><span class="fc-icon">🩺</span> Gen. Medicine</div>
+          <div class="filter-chip" onclick="setFilter('cardiology',this)"><span class="fc-icon">❤️</span> Cardiology</div>
+          <div class="filter-chip" onclick="setFilter('dermatology',this)"><span class="fc-icon">🧴</span> Dermatology</div>
+          <div class="filter-chip" onclick="setFilter('pediatrics',this)"><span class="fc-icon">👶</span> Pediatrics</div>
+          <div class="filter-chip" onclick="setFilter('ortho',this)"><span class="fc-icon">🦴</span> Orthopaedics</div>
+        </div>
+      </div>
+
+      <!-- LOCATION BAR -->
+      <div class="loc-bar">
+        <span class="loc-icon">📍</span>
+        <div style="flex:1">
+          <div class="loc-text" id="loc-text">Detecting your location...</div>
+          <div class="loc-city" id="loc-city">Using GPS</div>
+        </div>
+        <button class="loc-change" onclick="toggleCityPanel()">Change City</button>
+      </div>
+
+      <!-- CITY SWITCHER -->
+      <div class="city-bar" id="city-bar" style="display:none">
+        <div class="city-scroll">
+          <div class="city-btn active" onclick="setCity('Chennai',this)" style="position:relative">
+            <span class="city-icon">🌊</span> Chennai
+            <div class="nearby-dot"></div>
+          </div>
+          <div class="city-btn" onclick="setCity('Mumbai',this)"><span class="city-icon">🏙️</span> Mumbai</div>
+          <div class="city-btn" onclick="setCity('Bangalore',this)"><span class="city-icon">🌿</span> Bangalore</div>
+          <div class="city-btn" onclick="setCity('Delhi',this)"><span class="city-icon">🏛️</span> Delhi</div>
+          <div class="city-btn" onclick="setCity('Hyderabad',this)"><span class="city-icon">💎</span> Hyderabad</div>
+          <div class="city-btn" onclick="setCity('Pune',this)"><span class="city-icon">🎓</span> Pune</div>
+          <div class="city-btn" onclick="setCity('Kolkata',this)"><span class="city-icon">🌸</span> Kolkata</div>
+          <div class="city-btn" onclick="setCity('Ahmedabad',this)"><span class="city-icon">🦁</span> Ahmedabad</div>
+          <div class="city-btn" onclick="setCity('Coimbatore',this)"><span class="city-icon">🏭</span> Coimbatore</div>
+          <div class="city-btn" onclick="setCity('Jaipur',this)"><span class="city-icon">🏰</span> Jaipur</div>
+        </div>
+      </div>
+
+      <!-- RESULTS HEADER -->
+      <div class="results-header">
+        <div class="results-count" id="results-count"><span id="doc-count">8</span> doctors near you</div>
+        <select class="sort-select" onchange="sortDoctors(this.value)">
+          <option value="distance">Nearest first</option>
+          <option value="rating">Top rated</option>
+          <option value="fee">Lowest fee</option>
+          <option value="available">Available now</option>
+        </select>
+      </div>
+
+      <!-- DOCTOR LIST -->
+      <div class="doc-list" id="doc-list"></div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <!-- MAP -->
+      <div class="map-area">
+        <div class="map-placeholder" id="map">
+          <div class="map-grid"></div>
+
+          <!-- Roads -->
+          <div class="map-road-h" style="top:30%;left:0;right:0"></div>
+          <div class="map-road-h" style="top:55%;left:0;right:0;height:12px;opacity:0.5"></div>
+          <div class="map-road-h" style="top:72%;left:0;right:0"></div>
+          <div class="map-road-v" style="left:25%;top:0;bottom:0"></div>
+          <div class="map-road-v" style="left:55%;top:0;bottom:0;width:12px;opacity:0.5"></div>
+          <div class="map-road-v" style="left:78%;top:0;bottom:0"></div>
+
+          <!-- Blocks (buildings) -->
+          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:10%;left:5%;width:15%;height:18%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:10%;left:30%;width:20%;height:15%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:10%;left:60%;width:14%;height:18%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:35%;left:5%;width:16%;height:16%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:35%;left:30%;width:18%;height:16%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:35%;left:60%;width:14%;height:14%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:60%;left:5%;width:15%;height:15%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:60%;left:30%;width:18%;height:16%"></div>
+          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:78%;left:60%;width:14%;height:14%"></div>
+
+          <!-- My location -->
+          <div class="my-pin" style="left:48%;top:50%"><div class="my-pin-inner"></div></div>
+
+          <!-- Map pins injected by JS -->
+          <div id="map-pins"></div>
+
+          <!-- Controls -->
+          <div class="map-controls">
+            <div class="map-ctrl" onclick="locateMe()" title="My location">📍</div>
+            <div class="map-ctrl" title="Zoom in">+</div>
+            <div class="map-ctrl" title="Zoom out">−</div>
+            <div class="map-ctrl" title="Satellite view">🛰️</div>
+          </div>
+
+          <!-- Search this area -->
+          <div class="map-search-here" onclick="showToast('🔍 Searching this area...',1500)">
+            <span>🔍</span> Search this area
+          </div>
+
+          <!-- Legend -->
+          <div class="map-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#22C55E"></div> Available now</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div> Busy / Limited</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div> Not available</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div> You are here</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCTOR DETAIL PANEL -->
+      <div class="detail-panel collapsed" id="detail-panel">
+        <div class="detail-inner" id="detail-inner"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHAT OVERLAY -->
+<div class="chat-overlay" id="chat-overlay">
+  <div class="chat-header">
+    <div class="chat-havi">🤖</div>
+    <div>
+      <div class="chat-hname">ArogyaAI Expert</div>
+      <div class="chat-hsub"><div class="live-dot"></div> Online · Find right doctor</div>
+    </div>
+    <button class="chat-close" onclick="closeChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs">
+    <div class="cmsg ai">
+      <div class="cbub">
+        Namaste! 🙏 I'm your ArogyaAI health expert.<br><br>
+        Tell me your symptoms or what kind of doctor you're looking for — I'll find the best match near you and check their availability right now.
+      </div>
+      <div class="cqk">
+        <div class="cq" onclick="qs('I have fever and body ache')">🌡️ Fever</div>
+        <div class="cq" onclick="qs('I need a skin specialist')">🧴 Skin issue</div>
+        <div class="cq" onclick="qs('Chest pain or breathing issue')">❤️ Chest pain</div>
+        <div class="cq" onclick="qs('I need a doctor for my child')">👶 Child care</div>
+        <div class="cq" onclick="qs('I want tele consultation only')">📹 Tele only</div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-inp" id="chat-inp" placeholder="Describe symptoms or ask for a doctor..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- FLOATING AI BUTTON -->
+<div style="position:fixed;bottom:20px;right:20px;z-index:150">
+  <button id="ai-fab" onclick="openChat()" style="width:56px;height:56px;border-radius:50%;background:var(--teal);border:none;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 24px rgba(10,123,94,0.4);transition:all 0.2s;cursor:pointer" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</button>
+  <div style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">1</div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-ov" id="modal-ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════
+// DATA
+// ═══════════════════════════════
+const CITIES = {
+  Chennai: {lat:13.08,lng:80.27},
+  Mumbai: {lat:19.07,lng:72.87},
+  Bangalore: {lat:12.97,lng:77.59},
+  Delhi: {lat:28.70,lng:77.10},
+  Hyderabad: {lat:17.38,lng:78.48},
+  Pune: {lat:18.52,lng:73.85},
+  Kolkata: {lat:22.57,lng:88.36},
+  Ahmedabad: {lat:23.02,lng:72.57},
+  Coimbatore: {lat:11.01,lng:76.95},
+  Jaipur: {lat:26.91,lng:75.78}
+};
+
+const ALL_DOCTORS = [
+  {id:1,name:'Dr. Priya Sharma',spec:'General Medicine',qual:'MBBS, MD · Apollo Hospitals',city:'Chennai',area:'Anna Nagar',dist:1.2,fee:500,rating:4.9,reviews:148,exp:12,status:'available',tele:true,clinic:true,home:false,color:'#0A7B5E',initials:'PS',mapX:38,mapY:42,slots:['9:00','9:30','10:00','11:00','2:30','3:00'],teleSlots:['Now','9:30','10:30','2:00'],lang:['English','Tamil','Hindi']},
+  {id:2,name:'Dr. Arun Mehta',spec:'Cardiology',qual:'MBBS, DM · Fortis Hospital',city:'Chennai',area:'T. Nagar',dist:2.1,fee:900,rating:4.8,reviews:121,exp:20,status:'busy',tele:true,clinic:true,home:false,color:'#1A5CB8',initials:'AM',mapX:65,mapY:28,slots:['11:30','3:00','4:00'],teleSlots:['11:00','3:30'],lang:['English','Telugu','Hindi']},
+  {id:3,name:'Dr. Kavya Nair',spec:'Dermatology',qual:'MBBS, DVD · Skin Care Clinic',city:'Chennai',area:'Adyar',dist:0.8,fee:600,rating:4.7,reviews:98,exp:8,status:'available',tele:true,clinic:true,home:true,color:'#C03B2A',initials:'KN',mapX:22,mapY:62,slots:['Now','10:30','11:00','2:00','4:30'],teleSlots:['Now','10:00','11:30'],lang:['English','Tamil','Malayalam']},
+  {id:4,name:'Dr. Raj Singh',spec:'Pediatrics',qual:'MBBS, DCH · Rainbow Children',city:'Chennai',area:'Velachery',dist:3.4,fee:550,rating:4.9,reviews:87,exp:15,status:'available',tele:false,clinic:true,home:true,color:'#5B3FBE',initials:'RS',mapX:80,mapY:65,slots:['9:00','10:00','2:00','3:30'],teleSlots:[],lang:['English','Hindi','Bengali']},
+  {id:5,name:'Dr. Deepak Roy',spec:'Orthopaedics',qual:'MBBS, MS Ortho · MIOT',city:'Chennai',area:'K.K. Nagar',dist:2.8,fee:800,rating:4.6,reviews:76,exp:18,status:'away',tele:true,clinic:true,home:false,color:'#B87314',initials:'DR',mapX:50,mapY:78,slots:['3:00','4:00','5:00'],teleSlots:['2:30','4:30'],lang:['English','Tamil']},
+  {id:6,name:'Dr. Sneha Iyer',spec:'Gynaecology',qual:'MBBS, MS Gynae · GEM Hospital',city:'Chennai',area:'Mylapore',dist:1.6,fee:700,rating:4.8,reviews:112,exp:14,status:'available',tele:true,clinic:true,home:false,color:'#C03B5E',initials:'SI',mapX:30,mapY:35,slots:['10:00','11:00','2:30','4:00'],teleSlots:['Now','11:30','3:00'],lang:['English','Tamil','Kannada']},
+  {id:7,name:'Dr. Kiran Bhat',spec:'Neurology',qual:'MBBS, DM Neuro · Sri Ramachandra',city:'Chennai',area:'Porur',dist:5.1,fee:1200,rating:4.9,reviews:64,exp:22,status:'available',tele:true,clinic:true,home:false,color:'#2A7A3A',initials:'KB',mapX:14,mapY:50,slots:['10:30','11:30','3:00'],teleSlots:['10:00','2:00'],lang:['English','Kannada','Hindi']},
+  {id:8,name:'Dr. Meera Pillai',spec:'General Medicine',qual:'MBBS · Government General Hospital',city:'Chennai',area:'Park Town',dist:4.2,fee:250,rating:4.5,reviews:203,exp:9,status:'busy',tele:false,clinic:true,home:false,color:'#6B3FA0',initials:'MP',mapX:68,mapY:48,slots:['11:00','2:00','4:30'],teleSlots:[],lang:['English','Tamil','Malayalam']}
+];
+
+let doctors = [...ALL_DOCTORS];
+let activeFilter = 'all';
+let selectedDoc = null;
+let currentCity = 'Chennai';
+let chatHistory = [];
+
+// ═══════════════════════════════
+// RENDER DOCTORS
+// ═══════════════════════════════
+function renderDoctors(list) {
+  const container = document.getElementById('doc-list');
+  const count = document.getElementById('doc-count');
+  count.textContent = list.length;
+
+  if (!list.length) {
+    container.innerHTML = `<div class="no-results"><div class="nr-icon">🔍</div><p>No doctors found matching your criteria.<br>Try a different filter or <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="openChat()">ask our AI</span> for help.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(d => {
+    const statusLabel = d.status === 'available' ? 'Available now' : d.status === 'busy' ? 'Busy' : 'Away today';
+    const statusClass = d.status === 'available' ? 'status-avail' : d.status === 'busy' ? 'status-busy' : 'status-away';
+    const onlineDot = d.status === 'available' ? '#22C55E' : d.status === 'busy' ? '#F59E0B' : '#EF4444';
+    const nextSlot = d.slots[0] === 'Now' ? 'Available Now' : `Next: ${d.slots[0]}`;
+
+    return `
+    <div class="doc-card ${selectedDoc===d.id?'selected':''}" id="dc-${d.id}" onclick="selectDoctor(${d.id})">
+      <div class="dc-top">
+        <div class="dc-avi" style="background:${d.color}">
+          ${d.initials}
+          <div class="online-ring" style="background:${onlineDot}"></div>
+        </div>
+        <div class="dc-info">
+          <div class="dc-name">${d.name}</div>
+          <div class="dc-spec">${d.spec}</div>
+          <div class="dc-qual">${d.qual}</div>
+          <div class="dc-meta">
+            <span class="dc-meta-i">⭐ ${d.rating} (${d.reviews})</span>
+            <span class="dc-meta-i">⏱ ${d.exp} yrs</span>
+            <span class="dc-meta-i">📍 ${d.area} · ${d.dist} km</span>
+          </div>
+        </div>
+        <div class="dc-fee-wrap">
+          <div class="dc-fee">₹${d.fee}</div>
+          <div class="dc-fee-lbl">per consult</div>
+          <div class="dc-rating" style="color:${d.status==='available'?'var(--green)':d.status==='busy'?'var(--amber)':'var(--coral)'};font-size:10px;margin-top:4px">● ${statusLabel}</div>
+        </div>
+      </div>
+      <div class="dc-bottom">
+        <div class="dc-loc">📍 ${d.area}, ${d.city} · ${d.dist} km away</div>
+        <div class="dc-dist" style="background:${d.status==='available'?'var(--green-bg)':'var(--amber-bg)'};color:${d.status==='available'?'var(--green)':'var(--amber)'}">
+          ${nextSlot}
+        </div>
+      </div>
+      <div class="dc-tags">
+        ${d.clinic ? '<div class="dc-tag clinic-badge">🏥 Clinic</div>' : ''}
+        ${d.tele ? '<div class="dc-tag tele-badge">📹 Tele-consult</div>' : ''}
+        ${d.home ? '<div class="dc-tag home-badge">🏠 Home visit</div>' : ''}
+        ${d.lang.map(l=>`<div class="dc-tag" style="background:var(--cream2);color:var(--ink3)">${l}</div>`).join('')}
+      </div>
+      <div class="dc-actions">
+        <button class="btn-book" onclick="event.stopPropagation();openBooking(${d.id},'clinic')">Book Clinic</button>
+        <button class="btn-tele ${!d.tele?'disabled':''}" onclick="event.stopPropagation();${d.tele?`openBooking(${d.id},'tele')`:'showToast(\"Not available for tele-consult\",2000)'}">${d.tele?'📹 Tele-consult':'📹 Tele N/A'}</button>
+        <button class="btn-chat" onclick="event.stopPropagation();openChatForDoc(${d.id})">🤖 Ask AI</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderMapPins(list);
+}
+
+// ═══════════════════════════════
+// MAP PINS
+// ═══════════════════════════════
+function renderMapPins(list) {
+  const container = document.getElementById('map-pins');
+  const dotColors = {available:'#22C55E',busy:'#F59E0B',away:'#EF4444'};
+  container.innerHTML = list.map(d => `
+    <div class="map-pin ${selectedDoc===d.id?'selected':''}" id="pin-${d.id}" style="left:${d.mapX}%;top:${d.mapY}%" onclick="selectDoctor(${d.id})">
+      <div class="pin-bubble">
+        <div class="pin-avi" style="background:${d.color};width:24px;height:24px;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;color:#fff">${d.initials}</div>
+        <div>
+          <div class="pin-name">${d.name.split(' ').slice(1).join(' ')}</div>
+          <div class="pin-price" style="color:${selectedDoc===d.id?'rgba(255,255,255,0.8)':'var(--teal)'}">₹${d.fee}</div>
+        </div>
+        <div style="width:7px;height:7px;border-radius:50%;background:${dotColors[d.status]};flex-shrink:0"></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════
+// SELECT DOCTOR
+// ═══════════════════════════════
+function selectDoctor(id) {
+  selectedDoc = id;
+  const d = ALL_DOCTORS.find(x => x.id === id);
+  if (!d) return;
+
+  // highlight card
+  document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById('dc-'+id);
+  if (card) { card.classList.add('selected'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+
+  // highlight pin
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+  const pin = document.getElementById('pin-'+id);
+  if (pin) pin.classList.add('selected');
+
+  showDetail(d);
+}
+
+// ═══════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════
+function showDetail(d) {
+  const panel = document.getElementById('detail-panel');
+  const inner = document.getElementById('detail-inner');
+  const onlineDot = d.status === 'available' ? '#22C55E' : d.status === 'busy' ? '#F59E0B' : '#EF4444';
+  const statusTxt = d.status === 'available' ? 'Available now' : d.status === 'busy' ? 'Busy — limited slots' : 'Away today';
+
+  inner.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-avi" style="background:${d.color}">${d.initials}</div>
+      <div class="detail-info">
+        <div class="detail-name">${d.name}</div>
+        <div class="detail-spec">${d.spec} · ${d.qual}</div>
+        <div class="detail-qual">📍 ${d.area}, ${d.city} · ${d.dist} km · Languages: ${d.lang.join(', ')}</div>
+        <div class="detail-rating">
+          <span class="stars">★★★★★</span>
+          <span style="font-size:13px;font-weight:600">${d.rating}</span>
+          <span style="font-size:12px;color:var(--ink4)">(${d.reviews} reviews)</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;margin-left:8px;font-weight:600;color:${d.status==='available'?'var(--green)':d.status==='busy'?'var(--amber)':'var(--coral)'}">
+            <span style="width:7px;height:7px;border-radius:50%;background:${onlineDot};display:inline-block"></span>
+            ${statusTxt}
+          </span>
+        </div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+
+    <div class="detail-grid">
+      <div class="dg-item"><div class="dg-val">₹${d.fee}</div><div class="dg-lbl">Clinic visit</div></div>
+      <div class="dg-item"><div class="dg-val">${d.exp} yrs</div><div class="dg-lbl">Experience</div></div>
+      <div class="dg-item"><div class="dg-val">${d.reviews}</div><div class="dg-lbl">Reviews</div></div>
+    </div>
+
+    <div class="slots-label">🏥 Clinic slots today</div>
+    <div class="slots-grid">
+      ${d.slots.map((s,i) => `<div class="slot ${i===0&&s==='Now'?'sel':''}" onclick="selectSlot(this,'clinic')">${s==='Now'?'Now ✓':s}</div>`).join('')}
+    </div>
+
+    ${d.tele ? `
+    <div class="slots-label" style="margin-top:4px">📹 Tele-consult slots${d.status==='away'?' (available remotely)':''}</div>
+    <div class="slots-grid">
+      ${d.teleSlots.map((s,i) => `<div class="slot ${i===0&&s==='Now'?'sel':''}" onclick="selectSlot(this,'tele')">${s==='Now'?'Now ✓':s}</div>`).join('')}
+    </div>` : `
+    <div style="padding:10px;background:var(--cream2);border-radius:9px;font-size:12px;color:var(--ink3);margin-bottom:10px">
+      📹 This doctor is not available for tele-consultation. Book a clinic or home visit.
+    </div>`}
+
+    <div class="detail-actions" style="margin-top:10px">
+      <button class="dbtn-book" onclick="openBooking(${d.id},'clinic')">🏥 Book Clinic Visit</button>
+      <button class="dbtn-tele ${!d.tele?'off':''}" onclick="${d.tele?`openBooking(${d.id},'tele')`:'showToast(\"Not available for tele-consult\",2000)'}">📹 Tele-consult</button>
+      <button class="dbtn-ai" onclick="openChatForDoc(${d.id})">🤖 AI</button>
+    </div>
+  `;
+
+  panel.classList.remove('collapsed');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.add('collapsed');
+  selectedDoc = null;
+  document.querySelectorAll('.doc-card,.map-pin').forEach(el => el.classList.remove('selected'));
+}
+
+function selectSlot(el, type) {
+  el.closest('.slots-grid').querySelectorAll('.slot').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ═══════════════════════════════
+// BOOKING MODAL
+// ═══════════════════════════════
+function openBooking(id, type) {
+  const d = ALL_DOCTORS.find(x => x.id === id);
+  if (!d) return;
+  const isTele = type === 'tele';
+  const fee = isTele ? Math.round(d.fee * 0.8) : d.fee;
+  const slots = isTele ? d.teleSlots : d.slots;
+  const gst = Math.round(fee * 0.18);
+
+  const modal = document.getElementById('modal-box');
+  modal.innerHTML = `
+    <div class="mhead">
+      <h3>${isTele ? '📹 Book Tele-Consult' : '🏥 Book Clinic Visit'}</h3>
+      <button class="mclose" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mbody">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--cream);border-radius:10px;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:50%;background:${d.color};display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${d.initials}</div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700">${d.name}</div>
+          <div style="font-size:12px;color:var(--teal)">${d.spec} · ${d.area}, ${d.city}</div>
+        </div>
+        <div style="margin-left:auto;font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--teal)">₹${fee}</div>
+      </div>
+
+      ${isTele ? '<div style="background:var(--blue-bg);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:14px">📹 This is a video consultation. You will receive a link on WhatsApp 5 minutes before your slot.</div>' : ''}
+
+      <div class="mfield" style="margin-bottom:12px">
+        <label>Select Date</label>
+        <input type="date" id="bk-date" value="${new Date().toISOString().split('T')[0]}">
+      </div>
+
+      <div class="mfield" style="margin-bottom:12px">
+        <label>Select Time Slot</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px">
+          ${slots.map((s,i) => `<div class="slot ${i===0?'sel':''}" onclick="document.querySelectorAll('#modal-box .slot').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${s==='Now'?'Now ✓':s}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="mrow">
+        <div class="mfield">
+          <label>Your Name</label>
+          <input type="text" value="Rahul Kumar">
+        </div>
+        <div class="mfield">
+          <label>Mobile</label>
+          <input type="tel" value="+91 98765 43210">
+        </div>
+      </div>
+
+      <div class="mfield" style="margin-bottom:14px">
+        <label>Reason for visit</label>
+        <textarea placeholder="Brief description of symptoms or reason..."></textarea>
+      </div>
+
+      <div class="msummary">
+        <div class="ms-row"><span class="ms-lbl">Consultation fee</span><span class="ms-val">₹${fee}</span></div>
+        <div class="ms-row"><span class="ms-lbl">GST (18%)</span><span class="ms-val">₹${gst}</span></div>
+        <div class="ms-row"><span class="ms-lbl">Platform fee</span><span class="ms-val">₹0</span></div>
+        <div class="ms-row"><span class="ms-lbl" style="color:var(--ink)">Total</span><span class="ms-val" style="color:var(--teal);font-size:16px">₹${fee + gst}</span></div>
+      </div>
+
+      <button class="mbtn ${isTele?'mbtn-tele':''}" onclick="confirmBooking('${d.name}','${isTele?'Tele-consult':'Clinic visit'}')">
+        ${isTele ? '📹 Confirm Tele-Consult & Pay' : '✅ Confirm Booking & Pay via UPI'}
+      </button>
+    </div>
+  `;
+
+  document.getElementById('modal-ov').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-ov').classList.remove('open');
+}
+
+function confirmBooking(name, type) {
+  closeModal();
+  setTimeout(() => {
+    const modal = document.getElementById('modal-box');
+    modal.innerHTML = `
+      <div style="text-align:center;padding:40px 24px">
+        <div style="font-size:56px;margin-bottom:16px">🎉</div>
+        <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Booking Confirmed!</div>
+        <p style="font-size:14px;color:var(--ink3);line-height:1.6;margin-bottom:20px">${type} with <strong>${name}</strong> has been booked.<br>You'll receive a WhatsApp confirmation shortly.</p>
+        <div style="background:var(--teal-bg);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left;font-size:13px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--ink3)">Booking ID</span><span style="font-weight:600">#ARG${Math.floor(Math.random()*9000+1000)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--ink3)">WhatsApp alert</span><span style="color:var(--green);font-weight:600">✅ Sent</span></div>
+        </div>
+        <button class="mbtn" onclick="closeModal()">Done</button>
+      </div>`;
+    document.getElementById('modal-ov').classList.add('open');
+  }, 100);
+}
+
+// ═══════════════════════════════
+// SEARCH & FILTER
+// ═══════════════════════════════
+function handleSearch(val) {
+  const clear = document.getElementById('search-clear');
+  clear.classList.toggle('show', val.length > 0);
+  applyFilters(val);
+}
+
+function clearSearch() {
+  document.getElementById('search-inp').value = '';
+  document.getElementById('search-clear').classList.remove('show');
+  applyFilters('');
+}
+
+function setFilter(type, el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = type;
+  applyFilters(document.getElementById('search-inp').value);
+}
+
+function applyFilters(search='') {
+  let list = [...ALL_DOCTORS].filter(d => d.city === currentCity);
+  const q = search.toLowerCase().trim();
+  if (q) list = list.filter(d =>
+    d.name.toLowerCase().includes(q) ||
+    d.spec.toLowerCase().includes(q) ||
+    d.area.toLowerCase().includes(q) ||
+    d.qual.toLowerCase().includes(q)
+  );
+  if (activeFilter === 'available') list = list.filter(d => d.status === 'available');
+  else if (activeFilter === 'tele') list = list.filter(d => d.tele);
+  else if (activeFilter === 'clinic') list = list.filter(d => d.clinic);
+  else if (activeFilter === 'home') list = list.filter(d => d.home);
+  else if (activeFilter === 'genmedicine') list = list.filter(d => d.spec === 'General Medicine');
+  else if (activeFilter === 'cardiology') list = list.filter(d => d.spec === 'Cardiology');
+  else if (activeFilter === 'dermatology') list = list.filter(d => d.spec === 'Dermatology');
+  else if (activeFilter === 'pediatrics') list = list.filter(d => d.spec === 'Pediatrics');
+  else if (activeFilter === 'ortho') list = list.filter(d => d.spec === 'Orthopaedics');
+  doctors = list;
+  renderDoctors(list);
+}
+
+function sortDoctors(by) {
+  let list = [...doctors];
+  if (by === 'distance') list.sort((a,b) => a.dist - b.dist);
+  else if (by === 'rating') list.sort((a,b) => b.rating - a.rating);
+  else if (by === 'fee') list.sort((a,b) => a.fee - b.fee);
+  else if (by === 'available') list.sort((a,b) => (a.status==='available'?0:1) - (b.status==='available'?0:1));
+  renderDoctors(list);
+}
+
+// ═══════════════════════════════
+// CITY SWITCHER
+// ═══════════════════════════════
+let cityPanelOpen = false;
+function toggleCityPanel() {
+  cityPanelOpen = !cityPanelOpen;
+  document.getElementById('city-bar').style.display = cityPanelOpen ? 'block' : 'none';
+}
+
+function setCity(city, el) {
+  currentCity = city;
+  document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('loc-text').textContent = `Showing doctors in ${city}`;
+  document.getElementById('loc-city').textContent = city + ', India';
+  // For demo, Chennai has all 8 doctors; other cities show 2-4
+  if (city !== 'Chennai') {
+    const subset = ALL_DOCTORS.slice(0,3).map(d => ({...d, city, dist: +(Math.random()*5+0.5).toFixed(1)}));
+    renderDoctors(subset);
+    document.getElementById('doc-count').textContent = subset.length;
+    showToast(`📍 Showing doctors in ${city}`, 2000);
+  } else {
+    applyFilters(document.getElementById('search-inp').value);
+  }
+  cityPanelOpen = false;
+  document.getElementById('city-bar').style.display = 'none';
+}
+
+// ═══════════════════════════════
+// LOCATION
+// ═══════════════════════════════
+function locateMe() {
+  document.getElementById('loc-text').textContent = 'Detecting your location...';
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai';
+        document.getElementById('loc-city').textContent = 'Using GPS · 13.0827° N, 80.2707° E';
+        showToast('📍 Location updated!', 2000);
+      },
+      () => {
+        document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai (default)';
+        document.getElementById('loc-city').textContent = 'Location access denied — using default';
+      }
+    );
+  } else {
+    document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai (default)';
+  }
+}
+
+// ═══════════════════════════════
+// AI CHAT
+// ═══════════════════════════════
+function openChat() {
+  document.getElementById('chat-overlay').classList.add('open');
+  document.getElementById('ai-fab').style.display = 'none';
+}
+function closeChat() {
+  document.getElementById('chat-overlay').classList.remove('open');
+  document.getElementById('ai-fab').style.display = 'flex';
+}
+function openChatForDoc(id) {
+  const d = ALL_DOCTORS.find(x => x.id === id);
+  openChat();
+  setTimeout(() => addAIMsg(`I can see you're looking at <strong>${d.name}</strong> (${d.spec}). What would you like to know? I can help you decide if this doctor is right for your symptoms, or suggest alternatives.`), 300);
+}
+
+function qs(text) {
+  document.getElementById('chat-inp').value = text;
+  sendChat();
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  addUserMsg(text);
+  showTyping();
+
+  const ctx = `You are ArogyaAI's location-based doctor finder assistant. The user is in Chennai. 
+Available doctors nearby: ${ALL_DOCTORS.slice(0,6).map(d=>`${d.name} (${d.spec}, ${d.dist}km, ₹${d.fee}, ${d.status==='available'?'available now':'busy'}, tele: ${d.tele?'yes':'no'})`).join('; ')}.
+Help the user find the right doctor based on symptoms or preferences. Recommend specific doctors from the list with reasoning. Mention tele-consult option if doctor is unavailable in person. Keep responses concise and helpful. Always end with a suggested action (book clinic, tele-consult, etc).`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        system:ctx,
+        messages:[...chatHistory.map(m=>({role:m.r,content:m.t})),{role:'user',content:text}]
+      })
+    });
+    removeTyping();
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.content[0].text;
+      chatHistory.push({r:'user',t:text},{r:'assistant',t:reply});
+      addAIMsg(reply);
+    } else { fallbackChat(text); }
+  } catch(e) { removeTyping(); fallbackChat(text); }
+}
+
+function fallbackChat(text) {
+  const lc = text.toLowerCase();
+  let reply = '';
+  if (lc.includes('fever') || lc.includes('cold') || lc.includes('cough')) {
+    reply = `For fever and related symptoms, I recommend <strong>Dr. Priya Sharma</strong> (General Medicine, 1.2km away) — she's available right now and highly rated at 4.9★.<br><br>She offers both clinic visits (₹500) and tele-consult. Since she's nearby, would you prefer a clinic visit or tele-consult?`;
+  } else if (lc.includes('skin') || lc.includes('rash') || lc.includes('acne')) {
+    reply = `For skin issues, <strong>Dr. Kavya Nair</strong> (Dermatology) is your closest specialist at just 0.8km! She's available now and also does home visits.<br><br>She can assess rashes and skin conditions via tele-consult if you'd like to share photos first. Clinic fee is ₹600.`;
+  } else if (lc.includes('chest') || lc.includes('heart') || lc.includes('bp')) {
+    reply = `⚠️ Chest pain should be evaluated promptly. <strong>Dr. Arun Mehta</strong> (Cardiology, Fortis Hospital) is 2.1km away with slots available today.<br><br>If you're experiencing severe symptoms, please call 108 immediately. Otherwise, I'd recommend booking an urgent tele-consult now — Dr. Mehta has a slot at 11:00 AM.`;
+  } else if (lc.includes('child') || lc.includes('baby') || lc.includes('kid')) {
+    reply = `For children's health, <strong>Dr. Raj Singh</strong> (Pediatrics, Rainbow Children Hospital) is excellent — rated 4.9★ with 15 years experience. He's 3.4km away with clinic slots today.<br><br>Note: Dr. Raj doesn't do tele-consult, so a clinic visit is recommended for children.`;
+  } else if (lc.includes('tele') || lc.includes('video') || lc.includes('online')) {
+    const teleDoc = ALL_DOCTORS.filter(d => d.tele && d.status === 'available');
+    reply = `Great choice! These doctors are available for tele-consult right now:<br><br><strong>• Dr. Priya Sharma</strong> (Gen. Medicine) — Available Now, ₹400<br><strong>• Dr. Kavya Nair</strong> (Dermatology) — Available Now, ₹480<br><strong>• Dr. Sneha Iyer</strong> (Gynaecology) — Available Now, ₹560<br><br>Which specialty do you need?`;
+  } else {
+    reply = `I can help you find the right doctor nearby! Could you tell me:<br><br>1. What symptoms are you experiencing?<br>2. Do you prefer a clinic visit or tele-consult?<br>3. Any preferred language?<br><br>We have <strong>8 verified doctors</strong> within 5km of you right now.`;
+  }
+  addAIMsg(reply);
+}
+
+function addAIMsg(html) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg ai';
+  div.innerHTML = `<div class="cbub">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function addUserMsg(text) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg user';
+  div.innerHTML = `<div class="cbub">${text}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function showTyping() {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg ai'; div.id = 'typing';
+  div.innerHTML = `<div class="typing-row"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+// ═══════════════════════════════
+// TOAST
+// ═══════════════════════════════
+let toastTimer;
+function showToast(msg, dur=3000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), dur);
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+window.onload = () => {
+  // Simulate location detection
+  setTimeout(() => {
+    document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai';
+    document.getElementById('loc-city').textContent = 'GPS · 13.0827° N, 80.2707° E';
+  }, 800);
+
+  renderDoctors(ALL_DOCTORS);
+
+  // Auto-open chat after 3s with a nudge
+  setTimeout(() => {
+    showToast('🤖 Ask our AI to find the right doctor for your symptoms!', 4000);
+  }, 2500);
+};
+</script>
+</body>
+</html>
