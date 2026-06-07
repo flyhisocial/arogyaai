@@ -286,6 +286,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 .loading-shimmer{background:linear-gradient(90deg,var(--cream) 0%,var(--cream2) 50%,var(--cream) 100%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
+<script src="api.js"></script>
 </head>
 <body>
 
@@ -777,7 +778,24 @@ function closeModal() {
   document.getElementById('modal-ov').classList.remove('open');
 }
 
-function confirmBooking(name, type) {
+async function confirmBooking(name, type) {
+  // Call real booking API if logged in
+  if (AROGYAAI.isLoggedIn()) {
+    const doc = ALL_DOCTORS.find(d => d.name === name);
+    const dateEl = document.getElementById('bk-date');
+    const selSlot = document.querySelector('#modal-content .slot.sel');
+    if (doc) {
+      await AROGYAAI.bookAppointment({
+        doctor_id: doc.id || name,
+        date: dateEl ? dateEl.value : new Date().toISOString().split('T')[0],
+        time: selSlot ? selSlot.textContent.trim() : '10:00',
+        type: type.toLowerCase().includes('tele') ? 'tele' : 'clinic',
+        reason: document.querySelector('#modal-content textarea')?.value || ''
+      });
+    }
+  }
+  // Then show confirmation UI
+  
   closeModal();
   setTimeout(() => {
     const modal = document.getElementById('modal-box');
