@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0A7B5E">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ArogyaAI">
-  <link rel="apple-touch-icon" href="icon-192.svg">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ArogyaAI — Find Doctors Near You</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+<!doctype html><html lang=en><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://api.anthropic.com"><link href=manifest.json rel=manifest><meta content=#0A7B5E name=theme-color><meta content=yes name=mobile-web-app-capable><meta content=yes name=apple-mobile-web-app-capable><meta content=default name=apple-mobile-web-app-status-bar-style><meta content=ArogyaAI name=apple-mobile-web-app-title><link href=icon-192.svg rel=apple-touch-icon><meta charset=UTF-8><meta content="width=device-width,initial-scale=1.0" name=viewport><title>ArogyaAI — Find Doctors Near You</title><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel=stylesheet><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --teal:#0A7B5E;--teal-d:#054D3B;--teal-m:#1D9E75;--teal-l:#5DCAA5;
   --teal-bg:#E0F2EB;--teal-glow:rgba(10,123,94,0.15);
@@ -293,269 +276,15 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
 
 /* LOADING */
 .loading-shimmer{background:linear-gradient(90deg,var(--cream) 0%,var(--cream2) 50%,var(--cream) 100%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-</style>
-<script src="api.js"></script>
-</head>
-<body>
-
-<div class="app">
-  <!-- NAV -->
-  <div class="nav">
-    <a href="index.html" class="nav-logo">
-      <div class="logo-box">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v5M9.5 5.5h5M7 13c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="13" r="2.5" fill="#fff"/></svg>
-      </div>
-      ArogyaAI
-    </a>
-    <a href="index.html" class="nav-back">← Back to home</a>
-    <div class="nav-r">
-      <div style="font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:5px">
-        <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block"></span>
-        Using your location
-      </div>
-      <div class="nav-avi">RK</div>
-    </div>
-  </div>
-
-  <div class="main">
-    <!-- LEFT PANEL -->
-    <div class="left-panel">
-
-      <!-- SEARCH -->
-      <div class="search-bar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input class="search-input" id="search-inp" placeholder="Search doctor, specialty, clinic..." oninput="handleSearch(this.value)">
-          <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
-        </div>
-      </div>
-
-      <!-- FILTERS -->
-      <div class="filters">
-        <div class="filter-row" id="filter-row">
-          <div class="filter-chip active" onclick="setFilter('all',this)"><span class="fc-icon">🏥</span> All</div>
-          <div class="filter-chip" onclick="setFilter('available',this)"><span class="fc-icon">✅</span> Available Now</div>
-          <div class="filter-chip" onclick="setFilter('tele',this)"><span class="fc-icon">📹</span> Tele-consult</div>
-          <div class="filter-chip" onclick="setFilter('clinic',this)"><span class="fc-icon">🏨</span> Clinic Visit</div>
-          <div class="filter-chip" onclick="setFilter('home',this)"><span class="fc-icon">🏠</span> Home Visit</div>
-          <div class="filter-chip" onclick="setFilter('genmedicine',this)"><span class="fc-icon">🩺</span> Gen. Medicine</div>
-          <div class="filter-chip" onclick="setFilter('cardiology',this)"><span class="fc-icon">❤️</span> Cardiology</div>
-          <div class="filter-chip" onclick="setFilter('dermatology',this)"><span class="fc-icon">🧴</span> Dermatology</div>
-          <div class="filter-chip" onclick="setFilter('pediatrics',this)"><span class="fc-icon">👶</span> Pediatrics</div>
-          <div class="filter-chip" onclick="setFilter('ortho',this)"><span class="fc-icon">🦴</span> Orthopaedics</div>
-        </div>
-      </div>
-
-      <!-- LOCATION BAR -->
-      <div class="loc-bar">
-        <span class="loc-icon">📍</span>
-        <div style="flex:1">
-          <div class="loc-text" id="loc-text">Detecting your location...</div>
-          <div class="loc-city" id="loc-city">Using GPS</div>
-        </div>
-        <button class="loc-change" onclick="toggleCityPanel()">Change City</button>
-      </div>
-
-      <!-- CITY SWITCHER -->
-      <div class="city-bar" id="city-bar" style="display:none">
-        <div class="city-scroll">
-          <div class="city-btn active" onclick="setCity('Chennai',this)" style="position:relative">
-            <span class="city-icon">🌊</span> Chennai
-            <div class="nearby-dot"></div>
-          </div>
-          <div class="city-btn" onclick="setCity('Mumbai',this)"><span class="city-icon">🏙️</span> Mumbai</div>
-          <div class="city-btn" onclick="setCity('Bangalore',this)"><span class="city-icon">🌿</span> Bangalore</div>
-          <div class="city-btn" onclick="setCity('Delhi',this)"><span class="city-icon">🏛️</span> Delhi</div>
-          <div class="city-btn" onclick="setCity('Hyderabad',this)"><span class="city-icon">💎</span> Hyderabad</div>
-          <div class="city-btn" onclick="setCity('Pune',this)"><span class="city-icon">🎓</span> Pune</div>
-          <div class="city-btn" onclick="setCity('Kolkata',this)"><span class="city-icon">🌸</span> Kolkata</div>
-          <div class="city-btn" onclick="setCity('Ahmedabad',this)"><span class="city-icon">🦁</span> Ahmedabad</div>
-          <div class="city-btn" onclick="setCity('Coimbatore',this)"><span class="city-icon">🏭</span> Coimbatore</div>
-          <div class="city-btn" onclick="setCity('Jaipur',this)"><span class="city-icon">🏰</span> Jaipur</div>
-        </div>
-      </div>
-
-      <!-- RESULTS HEADER -->
-      <div class="results-header">
-        <div class="results-count" id="results-count"><span id="doc-count">8</span> doctors near you</div>
-        <select class="sort-select" onchange="sortDoctors(this.value)">
-          <option value="distance">Nearest first</option>
-          <option value="rating">Top rated</option>
-          <option value="fee">Lowest fee</option>
-          <option value="available">Available now</option>
-        </select>
-      </div>
-
-      <!-- DOCTOR LIST -->
-      <div class="doc-list" id="doc-list"></div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="right-panel">
-      <!-- MAP -->
-      <div class="map-area">
-        <div class="map-placeholder" id="map">
-          <div class="map-grid"></div>
-
-          <!-- Roads -->
-          <div class="map-road-h" style="top:30%;left:0;right:0"></div>
-          <div class="map-road-h" style="top:55%;left:0;right:0;height:12px;opacity:0.5"></div>
-          <div class="map-road-h" style="top:72%;left:0;right:0"></div>
-          <div class="map-road-v" style="left:25%;top:0;bottom:0"></div>
-          <div class="map-road-v" style="left:55%;top:0;bottom:0;width:12px;opacity:0.5"></div>
-          <div class="map-road-v" style="left:78%;top:0;bottom:0"></div>
-
-          <!-- Blocks (buildings) -->
-          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:10%;left:5%;width:15%;height:18%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:10%;left:30%;width:20%;height:15%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:10%;left:60%;width:14%;height:18%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:35%;left:5%;width:16%;height:16%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:35%;left:30%;width:18%;height:16%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:35%;left:60%;width:14%;height:14%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:60%;left:5%;width:15%;height:15%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.2);border-radius:4px;top:60%;left:30%;width:18%;height:16%"></div>
-          <div style="position:absolute;background:rgba(255,255,255,0.25);border-radius:4px;top:78%;left:60%;width:14%;height:14%"></div>
-
-          <!-- My location -->
-          <div class="my-pin" style="left:48%;top:50%"><div class="my-pin-inner"></div></div>
-
-          <!-- Map pins injected by JS -->
-          <div id="map-pins"></div>
-
-          <!-- Controls -->
-          <div class="map-controls">
-            <div class="map-ctrl" onclick="locateMe()" title="My location">📍</div>
-            <div class="map-ctrl" title="Zoom in">+</div>
-            <div class="map-ctrl" title="Zoom out">−</div>
-            <div class="map-ctrl" title="Satellite view">🛰️</div>
-          </div>
-
-          <!-- Search this area -->
-          <div class="map-search-here" onclick="showToast('🔍 Searching this area...',1500)">
-            <span>🔍</span> Search this area
-          </div>
-
-          <!-- Legend -->
-          <div class="map-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#22C55E"></div> Available now</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div> Busy / Limited</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div> Not available</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#2563EB"></div> You are here</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DOCTOR DETAIL PANEL -->
-      <div class="detail-panel collapsed" id="detail-panel">
-        <div class="detail-inner" id="detail-inner"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- AI CHAT OVERLAY -->
-<div class="chat-overlay" id="chat-overlay">
-  <div class="chat-header">
-    <div class="chat-havi">🤖</div>
-    <div>
-      <div class="chat-hname">ArogyaAI Expert</div>
-      <div class="chat-hsub"><div class="live-dot"></div> Online · Find right doctor</div>
-    </div>
-    <button class="chat-close" onclick="closeChat()">✕</button>
-  </div>
-  <div class="chat-msgs" id="chat-msgs">
-    <div class="cmsg ai">
-      <div class="cbub">
-        Namaste! 🙏 I'm your ArogyaAI health expert.<br><br>
-        Tell me your symptoms or what kind of doctor you're looking for — I'll find the best match near you and check their availability right now.
-      </div>
-      <div class="cqk">
-        <div class="cq" onclick="qs('I have fever and body ache')">🌡️ Fever</div>
-        <div class="cq" onclick="qs('I need a skin specialist')">🧴 Skin issue</div>
-        <div class="cq" onclick="qs('Chest pain or breathing issue')">❤️ Chest pain</div>
-        <div class="cq" onclick="qs('I need a doctor for my child')">👶 Child care</div>
-        <div class="cq" onclick="qs('I want tele consultation only')">📹 Tele only</div>
-      </div>
-    </div>
-  </div>
-  <div class="chat-input-row">
-    <input class="chat-inp" id="chat-inp" placeholder="Describe symptoms or ask for a doctor..." onkeydown="if(event.key==='Enter')sendChat()">
-    <button class="chat-send" onclick="sendChat()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-</div>
-
-<!-- FLOATING AI BUTTON -->
-<div style="position:fixed;bottom:20px;right:20px;z-index:150">
-  <button id="ai-fab" onclick="openChat()" style="width:56px;height:56px;border-radius:50%;background:var(--teal);border:none;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 24px rgba(10,123,94,0.4);transition:all 0.2s;cursor:pointer" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</button>
-  <div style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#EF4444;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">1</div>
-</div>
-
-<!-- BOOKING MODAL -->
-<div class="modal-ov" id="modal-ov" onclick="if(event.target===this)closeModal()">
-  <div class="modal" id="modal-box"></div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-// ═══════════════════════════════
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}</style><script src=api.js></script></head><body><div class=app><div class=nav><a class=nav-logo href=index.html> <div class=logo-box><svg viewbox="0 0 24 24" fill=none height=16 width=16><path d="M12 3v5M9.5 5.5h5M7 13c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke=#fff stroke-linecap=round stroke-width=2.5 /><circle cx=12 cy=13 fill=#fff r=2.5 /></svg></div> ArogyaAI </a><a class=nav-back href=index.html>← Back to home</a><div class=nav-r><div style=color:var(--ink3);align-items:center;gap:5px;font-size:12px;display:flex><span style=background:#22c55e;border-radius:50%;width:8px;height:8px;display:inline-block></span> Using your location</div><div class=nav-avi>RK</div></div></div><div class=main><div class=left-panel><div class=search-bar><div class=search-wrap><span class=search-icon>🔍</span><input placeholder="Search doctor, specialty, clinic..." class=search-input id=search-inp oninput=handleSearch(this.value)><button class=search-clear id=search-clear onclick=clearSearch()>✕</button></div></div><div class=filters><div class=filter-row id=filter-row><div class="filter-chip active" onclick="setFilter('all',this)"><span class=fc-icon>🏥</span> All</div><div onclick="setFilter('available',this)" class=filter-chip><span class=fc-icon>✅</span> Available Now</div><div onclick="setFilter('tele',this)" class=filter-chip><span class=fc-icon>📹</span> Tele-consult</div><div onclick="setFilter('clinic',this)" class=filter-chip><span class=fc-icon>🏨</span> Clinic Visit</div><div onclick="setFilter('home',this)" class=filter-chip><span class=fc-icon>🏠</span> Home Visit</div><div onclick="setFilter('genmedicine',this)" class=filter-chip><span class=fc-icon>🩺</span> Gen. Medicine</div><div onclick="setFilter('cardiology',this)" class=filter-chip><span class=fc-icon>❤️</span> Cardiology</div><div onclick="setFilter('dermatology',this)" class=filter-chip><span class=fc-icon>🧴</span> Dermatology</div><div onclick="setFilter('pediatrics',this)" class=filter-chip><span class=fc-icon>👶</span> Pediatrics</div><div onclick="setFilter('ortho',this)" class=filter-chip><span class=fc-icon>🦴</span> Orthopaedics</div></div></div><div class=loc-bar><span class=loc-icon>📍</span><div style=flex:1><div class=loc-text id=loc-text>Detecting your location...</div><div class=loc-city id=loc-city>Using GPS</div></div><button class=loc-change onclick=toggleCityPanel()>Change City</button></div><div class=city-bar id=city-bar style=display:none><div class=city-scroll><div class="city-btn active" onclick="setCity('Chennai',this)" style=position:relative><span class=city-icon>🌊</span> Chennai <div class=nearby-dot></div></div><div onclick="setCity('Mumbai',this)" class=city-btn><span class=city-icon>🏙️</span> Mumbai</div><div onclick="setCity('Bangalore',this)" class=city-btn><span class=city-icon>🌿</span> Bangalore</div><div onclick="setCity('Delhi',this)" class=city-btn><span class=city-icon>🏛️</span> Delhi</div><div onclick="setCity('Hyderabad',this)" class=city-btn><span class=city-icon>💎</span> Hyderabad</div><div onclick="setCity('Pune',this)" class=city-btn><span class=city-icon>🎓</span> Pune</div><div onclick="setCity('Kolkata',this)" class=city-btn><span class=city-icon>🌸</span> Kolkata</div><div onclick="setCity('Ahmedabad',this)" class=city-btn><span class=city-icon>🦁</span> Ahmedabad</div><div onclick="setCity('Coimbatore',this)" class=city-btn><span class=city-icon>🏭</span> Coimbatore</div><div onclick="setCity('Jaipur',this)" class=city-btn><span class=city-icon>🏰</span> Jaipur</div></div></div><div class=results-header><div class=results-count id=results-count><span id=doc-count>8</span> doctors near you</div><select class=sort-select onchange=sortDoctors(this.value)><option value=distance>Nearest first</option><option value=rating>Top rated</option><option value=fee>Lowest fee</option><option value=available>Available now</option></select></div><div class=doc-list id=doc-list></div></div><div class=right-panel><div class=map-area><div class=map-placeholder id=map><div class=map-grid></div><div class=map-road-h style=top:30%;left:0;right:0></div><div class=map-road-h style=opacity:.5;height:12px;top:55%;left:0;right:0></div><div class=map-road-h style=top:72%;left:0;right:0></div><div class=map-road-v style=top:0;bottom:0;left:25%></div><div class=map-road-v style=opacity:.5;width:12px;top:0;bottom:0;left:55%></div><div class=map-road-v style=top:0;bottom:0;left:78%></div><div style=background:#ffffff40;border-radius:4px;width:15%;height:18%;position:absolute;top:10%;left:5%></div><div style=background:#fff3;border-radius:4px;width:20%;height:15%;position:absolute;top:10%;left:30%></div><div style=background:#ffffff40;border-radius:4px;width:14%;height:18%;position:absolute;top:10%;left:60%></div><div style=background:#fff3;border-radius:4px;width:16%;height:16%;position:absolute;top:35%;left:5%></div><div style=background:#ffffff40;border-radius:4px;width:18%;height:16%;position:absolute;top:35%;left:30%></div><div style=background:#fff3;border-radius:4px;width:14%;height:14%;position:absolute;top:35%;left:60%></div><div style=background:#ffffff40;border-radius:4px;width:15%;height:15%;position:absolute;top:60%;left:5%></div><div style=background:#fff3;border-radius:4px;width:18%;height:16%;position:absolute;top:60%;left:30%></div><div style=background:#ffffff40;border-radius:4px;width:14%;height:14%;position:absolute;top:78%;left:60%></div><div class=my-pin style=top:50%;left:48%><div class=my-pin-inner></div></div><div id=map-pins></div><div class=map-controls><div title="My location" class=map-ctrl onclick=locateMe()>📍</div><div title="Zoom in" class=map-ctrl>+</div><div title="Zoom out" class=map-ctrl>−</div><div title="Satellite view" class=map-ctrl>🛰️</div></div><div onclick="showToast('🔍 Searching this area...',1500)" class=map-search-here><span>🔍</span> Search this area</div><div class=map-legend><div class=legend-item><div class=legend-dot style=background:#22c55e></div> Available now</div><div class=legend-item><div class=legend-dot style=background:#f59e0b></div> Busy / Limited</div><div class=legend-item><div class=legend-dot style=background:#ef4444></div> Not available</div><div class=legend-item><div class=legend-dot style=background:#2563eb></div> You are here</div></div></div></div><div class="detail-panel collapsed" id=detail-panel><div class=detail-inner id=detail-inner></div></div></div></div></div><div class=chat-overlay id=chat-overlay><div class=chat-header><div class=chat-havi>🤖</div><div><div class=chat-hname>ArogyaAI Expert</div><div class=chat-hsub><div class=live-dot></div> Online · Find right doctor</div></div><button class=chat-close onclick=closeChat()>✕</button></div><div class=chat-msgs id=chat-msgs><div class="cmsg ai"><div class=cbub>Namaste! 🙏 I'm your ArogyaAI health expert.<br><br> Tell me your symptoms or what kind of doctor you're looking for — I'll find the best match near you and check their availability right now.</div><div class=cqk><div onclick="qs('I have fever and body ache')" class=cq>🌡️ Fever</div><div onclick="qs('I need a skin specialist')" class=cq>🧴 Skin issue</div><div onclick="qs('Chest pain or breathing issue')" class=cq>❤️ Chest pain</div><div onclick="qs('I need a doctor for my child')" class=cq>👶 Child care</div><div onclick="qs('I want tele consultation only')" class=cq>📹 Tele only</div></div></div></div><div class=chat-input-row><input onkeydown="if(event.key==='Enter')sendChat()" placeholder="Describe symptoms or ask for a doctor..." class=chat-inp id=chat-inp><button class=chat-send onclick=sendChat()><svg viewbox="0 0 24 24" fill=none height=15 width=15><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke=#fff stroke-linecap=round stroke-width=2.5 /></svg></button></div></div><div style=z-index:150;position:fixed;bottom:20px;right:20px><button onmouseout="this.style.transform='scale(1)'" onmouseover="this.style.transform='scale(1.1)'" style="background:var(--teal);cursor:pointer;border:none;border-radius:50%;justify-content:center;align-items:center;width:56px;height:56px;font-size:24px;transition:all .2s;display:flex;box-shadow:0 8px 24px #0a7b5e66" id=ai-fab onclick=openChat()>🤖</button><div style="color:#fff;background:#ef4444;border:2px solid #fff;border-radius:50%;justify-content:center;align-items:center;width:18px;height:18px;font-size:9px;font-weight:700;display:flex;position:absolute;top:-4px;right:-4px">1</div></div><div onclick="if(event.target===this)closeModal()" class=modal-ov id=modal-ov><div class=modal id=modal-box></div></div><div class=toast id=toast></div><script>// ═══════════════════════════════
 // DATA
 // ═══════════════════════════════
-const CITIES = {
-  Chennai: {lat:13.08,lng:80.27},
-  Mumbai: {lat:19.07,lng:72.87},
-  Bangalore: {lat:12.97,lng:77.59},
-  Delhi: {lat:28.70,lng:77.10},
-  Hyderabad: {lat:17.38,lng:78.48},
-  Pune: {lat:18.52,lng:73.85},
-  Kolkata: {lat:22.57,lng:88.36},
-  Ahmedabad: {lat:23.02,lng:72.57},
-  Coimbatore: {lat:11.01,lng:76.95},
-  Jaipur: {lat:26.91,lng:75.78}
-};
-
-const ALL_DOCTORS = [
-  {id:1,name:'Dr. Priya Sharma',spec:'General Medicine',qual:'MBBS, MD · Apollo Hospitals',city:'Chennai',area:'Anna Nagar',dist:1.2,fee:500,rating:4.9,reviews:148,exp:12,status:'available',tele:true,clinic:true,home:false,color:'#0A7B5E',initials:'PS',mapX:38,mapY:42,slots:['9:00','9:30','10:00','11:00','2:30','3:00'],teleSlots:['Now','9:30','10:30','2:00'],lang:['English','Tamil','Hindi']},
-  {id:2,name:'Dr. Arun Mehta',spec:'Cardiology',qual:'MBBS, DM · Fortis Hospital',city:'Chennai',area:'T. Nagar',dist:2.1,fee:900,rating:4.8,reviews:121,exp:20,status:'busy',tele:true,clinic:true,home:false,color:'#1A5CB8',initials:'AM',mapX:65,mapY:28,slots:['11:30','3:00','4:00'],teleSlots:['11:00','3:30'],lang:['English','Telugu','Hindi']},
-  {id:3,name:'Dr. Kavya Nair',spec:'Dermatology',qual:'MBBS, DVD · Skin Care Clinic',city:'Chennai',area:'Adyar',dist:0.8,fee:600,rating:4.7,reviews:98,exp:8,status:'available',tele:true,clinic:true,home:true,color:'#C03B2A',initials:'KN',mapX:22,mapY:62,slots:['Now','10:30','11:00','2:00','4:30'],teleSlots:['Now','10:00','11:30'],lang:['English','Tamil','Malayalam']},
-  {id:4,name:'Dr. Raj Singh',spec:'Pediatrics',qual:'MBBS, DCH · Rainbow Children',city:'Chennai',area:'Velachery',dist:3.4,fee:550,rating:4.9,reviews:87,exp:15,status:'available',tele:false,clinic:true,home:true,color:'#5B3FBE',initials:'RS',mapX:80,mapY:65,slots:['9:00','10:00','2:00','3:30'],teleSlots:[],lang:['English','Hindi','Bengali']},
-  {id:5,name:'Dr. Deepak Roy',spec:'Orthopaedics',qual:'MBBS, MS Ortho · MIOT',city:'Chennai',area:'K.K. Nagar',dist:2.8,fee:800,rating:4.6,reviews:76,exp:18,status:'away',tele:true,clinic:true,home:false,color:'#B87314',initials:'DR',mapX:50,mapY:78,slots:['3:00','4:00','5:00'],teleSlots:['2:30','4:30'],lang:['English','Tamil']},
-  {id:6,name:'Dr. Sneha Iyer',spec:'Gynaecology',qual:'MBBS, MS Gynae · GEM Hospital',city:'Chennai',area:'Mylapore',dist:1.6,fee:700,rating:4.8,reviews:112,exp:14,status:'available',tele:true,clinic:true,home:false,color:'#C03B5E',initials:'SI',mapX:30,mapY:35,slots:['10:00','11:00','2:30','4:00'],teleSlots:['Now','11:30','3:00'],lang:['English','Tamil','Kannada']},
-  {id:7,name:'Dr. Kiran Bhat',spec:'Neurology',qual:'MBBS, DM Neuro · Sri Ramachandra',city:'Chennai',area:'Porur',dist:5.1,fee:1200,rating:4.9,reviews:64,exp:22,status:'available',tele:true,clinic:true,home:false,color:'#2A7A3A',initials:'KB',mapX:14,mapY:50,slots:['10:30','11:30','3:00'],teleSlots:['10:00','2:00'],lang:['English','Kannada','Hindi']},
-  {id:8,name:'Dr. Meera Pillai',spec:'General Medicine',qual:'MBBS · Government General Hospital',city:'Chennai',area:'Park Town',dist:4.2,fee:250,rating:4.5,reviews:203,exp:9,status:'busy',tele:false,clinic:true,home:false,color:'#6B3FA0',initials:'MP',mapX:68,mapY:48,slots:['11:00','2:00','4:30'],teleSlots:[],lang:['English','Tamil','Malayalam']}
-];
-
-let doctors = [...ALL_DOCTORS];
-let activeFilter = 'all';
-let selectedDoc = null;
-let currentCity = 'Chennai';
-let chatHistory = [];
-
+const CITIES={Chennai:{lat:13.08,lng:80.27},Mumbai:{lat:19.07,lng:72.87},Bangalore:{lat:12.97,lng:77.59},Delhi:{lat:28.7,lng:77.1},Hyderabad:{lat:17.38,lng:78.48},Pune:{lat:18.52,lng:73.85},Kolkata:{lat:22.57,lng:88.36},Ahmedabad:{lat:23.02,lng:72.57},Coimbatore:{lat:11.01,lng:76.95},Jaipur:{lat:26.91,lng:75.78}},ALL_DOCTORS=[{id:1,name:`Dr. Priya Sharma`,spec:`General Medicine`,qual:`MBBS, MD · Apollo Hospitals`,city:`Chennai`,area:`Anna Nagar`,dist:1.2,fee:500,rating:4.9,reviews:148,exp:12,status:`available`,tele:!0,clinic:!0,home:!1,color:`#0A7B5E`,initials:`PS`,mapX:38,mapY:42,slots:[`9:00`,`9:30`,`10:00`,`11:00`,`2:30`,`3:00`],teleSlots:[`Now`,`9:30`,`10:30`,`2:00`],lang:[`English`,`Tamil`,`Hindi`]},{id:2,name:`Dr. Arun Mehta`,spec:`Cardiology`,qual:`MBBS, DM · Fortis Hospital`,city:`Chennai`,area:`T. Nagar`,dist:2.1,fee:900,rating:4.8,reviews:121,exp:20,status:`busy`,tele:!0,clinic:!0,home:!1,color:`#1A5CB8`,initials:`AM`,mapX:65,mapY:28,slots:[`11:30`,`3:00`,`4:00`],teleSlots:[`11:00`,`3:30`],lang:[`English`,`Telugu`,`Hindi`]},{id:3,name:`Dr. Kavya Nair`,spec:`Dermatology`,qual:`MBBS, DVD · Skin Care Clinic`,city:`Chennai`,area:`Adyar`,dist:.8,fee:600,rating:4.7,reviews:98,exp:8,status:`available`,tele:!0,clinic:!0,home:!0,color:`#C03B2A`,initials:`KN`,mapX:22,mapY:62,slots:[`Now`,`10:30`,`11:00`,`2:00`,`4:30`],teleSlots:[`Now`,`10:00`,`11:30`],lang:[`English`,`Tamil`,`Malayalam`]},{id:4,name:`Dr. Raj Singh`,spec:`Pediatrics`,qual:`MBBS, DCH · Rainbow Children`,city:`Chennai`,area:`Velachery`,dist:3.4,fee:550,rating:4.9,reviews:87,exp:15,status:`available`,tele:!1,clinic:!0,home:!0,color:`#5B3FBE`,initials:`RS`,mapX:80,mapY:65,slots:[`9:00`,`10:00`,`2:00`,`3:30`],teleSlots:[],lang:[`English`,`Hindi`,`Bengali`]},{id:5,name:`Dr. Deepak Roy`,spec:`Orthopaedics`,qual:`MBBS, MS Ortho · MIOT`,city:`Chennai`,area:`K.K. Nagar`,dist:2.8,fee:800,rating:4.6,reviews:76,exp:18,status:`away`,tele:!0,clinic:!0,home:!1,color:`#B87314`,initials:`DR`,mapX:50,mapY:78,slots:[`3:00`,`4:00`,`5:00`],teleSlots:[`2:30`,`4:30`],lang:[`English`,`Tamil`]},{id:6,name:`Dr. Sneha Iyer`,spec:`Gynaecology`,qual:`MBBS, MS Gynae · GEM Hospital`,city:`Chennai`,area:`Mylapore`,dist:1.6,fee:700,rating:4.8,reviews:112,exp:14,status:`available`,tele:!0,clinic:!0,home:!1,color:`#C03B5E`,initials:`SI`,mapX:30,mapY:35,slots:[`10:00`,`11:00`,`2:30`,`4:00`],teleSlots:[`Now`,`11:30`,`3:00`],lang:[`English`,`Tamil`,`Kannada`]},{id:7,name:`Dr. Kiran Bhat`,spec:`Neurology`,qual:`MBBS, DM Neuro · Sri Ramachandra`,city:`Chennai`,area:`Porur`,dist:5.1,fee:1200,rating:4.9,reviews:64,exp:22,status:`available`,tele:!0,clinic:!0,home:!1,color:`#2A7A3A`,initials:`KB`,mapX:14,mapY:50,slots:[`10:30`,`11:30`,`3:00`],teleSlots:[`10:00`,`2:00`],lang:[`English`,`Kannada`,`Hindi`]},{id:8,name:`Dr. Meera Pillai`,spec:`General Medicine`,qual:`MBBS · Government General Hospital`,city:`Chennai`,area:`Park Town`,dist:4.2,fee:250,rating:4.5,reviews:203,exp:9,status:`busy`,tele:!1,clinic:!0,home:!1,color:`#6B3FA0`,initials:`MP`,mapX:68,mapY:48,slots:[`11:00`,`2:00`,`4:30`],teleSlots:[],lang:[`English`,`Tamil`,`Malayalam`]}];let doctors=[...ALL_DOCTORS],activeFilter=`all`,selectedDoc=null,currentCity=`Chennai`,chatHistory=[];
 // ═══════════════════════════════
 // RENDER DOCTORS
 // ═══════════════════════════════
-function renderDoctors(list) {
-  const container = document.getElementById('doc-list');
-  const count = document.getElementById('doc-count');
-  count.textContent = list.length;
-
-  if (!list.length) {
-    container.innerHTML = `<div class="no-results"><div class="nr-icon">🔍</div><p>No doctors found matching your criteria.<br>Try a different filter or <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="openChat()">ask our AI</span> for help.</p></div>`;
-    return;
-  }
-
-  container.innerHTML = list.map(d => {
-    const statusLabel = d.status === 'available' ? 'Available now' : d.status === 'busy' ? 'Busy' : 'Away today';
-    const statusClass = d.status === 'available' ? 'status-avail' : d.status === 'busy' ? 'status-busy' : 'status-away';
-    const onlineDot = d.status === 'available' ? '#22C55E' : d.status === 'busy' ? '#F59E0B' : '#EF4444';
-    const nextSlot = d.slots[0] === 'Now' ? 'Available Now' : `Next: ${d.slots[0]}`;
-
-    return `
-    <div class="doc-card ${selectedDoc===d.id?'selected':''}" id="dc-${d.id}" onclick="selectDoctor(${d.id})">
+function renderDoctors(list){let container=document.getElementById(`doc-list`),count=document.getElementById(`doc-count`);if(count.textContent=list.length,!list.length){container.innerHTML=`<div class="no-results"><div class="nr-icon">🔍</div><p>No doctors found matching your criteria.<br>Try a different filter or <span style="color:var(--teal);cursor:pointer;font-weight:600" onclick="openChat()">ask our AI</span> for help.</p></div>`;return}container.innerHTML=list.map(d=>{let statusLabel=d.status===`available`?`Available now`:d.status===`busy`?`Busy`:`Away today`,statusClass=d.status===`available`?`status-avail`:d.status===`busy`?`status-busy`:`status-away`,onlineDot=d.status===`available`?`#22C55E`:d.status===`busy`?`#F59E0B`:`#EF4444`,nextSlot=d.slots[0]===`Now`?`Available Now`:`Next: ${d.slots[0]}`;return`
+    <div class="doc-card ${selectedDoc===d.id?`selected`:``}" id="dc-${d.id}" onclick="selectDoctor(${d.id})">
       <div class="dc-top">
         <div class="dc-avi" style="background:${d.color}">
           ${d.initials}
@@ -574,93 +303,64 @@ function renderDoctors(list) {
         <div class="dc-fee-wrap">
           <div class="dc-fee">₹${d.fee}</div>
           <div class="dc-fee-lbl">per consult</div>
-          <div class="dc-rating" style="color:${d.status==='available'?'var(--green)':d.status==='busy'?'var(--amber)':'var(--coral)'};font-size:10px;margin-top:4px">● ${statusLabel}</div>
+          <div class="dc-rating" style="color:${d.status===`available`?`var(--green)`:d.status===`busy`?`var(--amber)`:`var(--coral)`};font-size:10px;margin-top:4px">● ${statusLabel}</div>
         </div>
       </div>
       <div class="dc-bottom">
         <div class="dc-loc">📍 ${d.area}, ${d.city} · ${d.dist} km away</div>
-        <div class="dc-dist" style="background:${d.status==='available'?'var(--green-bg)':'var(--amber-bg)'};color:${d.status==='available'?'var(--green)':'var(--amber)'}">
+        <div class="dc-dist" style="background:${d.status===`available`?`var(--green-bg)`:`var(--amber-bg)`};color:${d.status===`available`?`var(--green)`:`var(--amber)`}">
           ${nextSlot}
         </div>
       </div>
       <div class="dc-tags">
-        ${d.clinic ? '<div class="dc-tag clinic-badge">🏥 Clinic</div>' : ''}
-        ${d.tele ? '<div class="dc-tag tele-badge">📹 Tele-consult</div>' : ''}
-        ${d.home ? '<div class="dc-tag home-badge">🏠 Home visit</div>' : ''}
-        ${d.lang.map(l=>`<div class="dc-tag" style="background:var(--cream2);color:var(--ink3)">${l}</div>`).join('')}
+        ${d.clinic?`<div class="dc-tag clinic-badge">🏥 Clinic</div>`:``}
+        ${d.tele?`<div class="dc-tag tele-badge">📹 Tele-consult</div>`:``}
+        ${d.home?`<div class="dc-tag home-badge">🏠 Home visit</div>`:``}
+        ${d.lang.map(l=>`<div class="dc-tag" style="background:var(--cream2);color:var(--ink3)">${l}</div>`).join(``)}
       </div>
       <div class="dc-actions">
         <button class="btn-book" onclick="event.stopPropagation();openBooking(${d.id},'clinic')">Book Clinic</button>
-        <button class="btn-tele ${!d.tele?'disabled':''}" onclick="event.stopPropagation();${d.tele?`openBooking(${d.id},'tele')`:'showToast(\"Not available for tele-consult\",2000)'}">${d.tele?'📹 Tele-consult':'📹 Tele N/A'}</button>
+        <button class="btn-tele ${d.tele?``:`disabled`}" onclick="event.stopPropagation();${d.tele?`openBooking(${d.id},'tele')`:`showToast("Not available for tele-consult",2000)`}">${d.tele?`📹 Tele-consult`:`📹 Tele N/A`}</button>
         <button class="btn-chat" onclick="event.stopPropagation();openChatForDoc(${d.id})">🤖 Ask AI</button>
       </div>
-    </div>`;
-  }).join('');
-
-  renderMapPins(list);
-}
-
+    </div>`}).join(``),renderMapPins(list)}
 // ═══════════════════════════════
 // MAP PINS
 // ═══════════════════════════════
-function renderMapPins(list) {
-  const container = document.getElementById('map-pins');
-  const dotColors = {available:'#22C55E',busy:'#F59E0B',away:'#EF4444'};
-  container.innerHTML = list.map(d => `
-    <div class="map-pin ${selectedDoc===d.id?'selected':''}" id="pin-${d.id}" style="left:${d.mapX}%;top:${d.mapY}%" onclick="selectDoctor(${d.id})">
+function renderMapPins(list){let container=document.getElementById(`map-pins`),dotColors={available:`#22C55E`,busy:`#F59E0B`,away:`#EF4444`};container.innerHTML=list.map(d=>`
+    <div class="map-pin ${selectedDoc===d.id?`selected`:``}" id="pin-${d.id}" style="left:${d.mapX}%;top:${d.mapY}%" onclick="selectDoctor(${d.id})">
       <div class="pin-bubble">
         <div class="pin-avi" style="background:${d.color};width:24px;height:24px;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;color:#fff">${d.initials}</div>
         <div>
-          <div class="pin-name">${d.name.split(' ').slice(1).join(' ')}</div>
-          <div class="pin-price" style="color:${selectedDoc===d.id?'rgba(255,255,255,0.8)':'var(--teal)'}">₹${d.fee}</div>
+          <div class="pin-name">${d.name.split(` `).slice(1).join(` `)}</div>
+          <div class="pin-price" style="color:${selectedDoc===d.id?`rgba(255,255,255,0.8)`:`var(--teal)`}">₹${d.fee}</div>
         </div>
         <div style="width:7px;height:7px;border-radius:50%;background:${dotColors[d.status]};flex-shrink:0"></div>
       </div>
-    </div>`).join('');
-}
-
+    </div>`).join(``)}
 // ═══════════════════════════════
 // SELECT DOCTOR
 // ═══════════════════════════════
-function selectDoctor(id) {
-  selectedDoc = id;
-  const d = ALL_DOCTORS.find(x => x.id === id);
-  if (!d) return;
-
-  // highlight card
-  document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('selected'));
-  const card = document.getElementById('dc-'+id);
-  if (card) { card.classList.add('selected'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
-
-  // highlight pin
-  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
-  const pin = document.getElementById('pin-'+id);
-  if (pin) pin.classList.add('selected');
-
-  showDetail(d);
-}
-
+function selectDoctor(id){selectedDoc=id;let d=ALL_DOCTORS.find(x=>x.id===id);if(!d)return;
+// highlight card
+document.querySelectorAll(`.doc-card`).forEach(c=>c.classList.remove(`selected`));let card=document.getElementById(`dc-`+id);
+// highlight pin
+card&&(card.classList.add(`selected`),card.scrollIntoView({behavior:`smooth`,block:`nearest`})),document.querySelectorAll(`.map-pin`).forEach(p=>p.classList.remove(`selected`));let pin=document.getElementById(`pin-`+id);pin&&pin.classList.add(`selected`),showDetail(d)}
 // ═══════════════════════════════
 // DETAIL PANEL
 // ═══════════════════════════════
-function showDetail(d) {
-  const panel = document.getElementById('detail-panel');
-  const inner = document.getElementById('detail-inner');
-  const onlineDot = d.status === 'available' ? '#22C55E' : d.status === 'busy' ? '#F59E0B' : '#EF4444';
-  const statusTxt = d.status === 'available' ? 'Available now' : d.status === 'busy' ? 'Busy — limited slots' : 'Away today';
-
-  inner.innerHTML = `
+function showDetail(d){let panel=document.getElementById(`detail-panel`),inner=document.getElementById(`detail-inner`),onlineDot=d.status===`available`?`#22C55E`:d.status===`busy`?`#F59E0B`:`#EF4444`,statusTxt=d.status===`available`?`Available now`:d.status===`busy`?`Busy — limited slots`:`Away today`;inner.innerHTML=`
     <div class="detail-header">
       <div class="detail-avi" style="background:${d.color}">${d.initials}</div>
       <div class="detail-info">
         <div class="detail-name">${d.name}</div>
         <div class="detail-spec">${d.spec} · ${d.qual}</div>
-        <div class="detail-qual">📍 ${d.area}, ${d.city} · ${d.dist} km · Languages: ${d.lang.join(', ')}</div>
+        <div class="detail-qual">📍 ${d.area}, ${d.city} · ${d.dist} km · Languages: ${d.lang.join(`, `)}</div>
         <div class="detail-rating">
           <span class="stars">★★★★★</span>
           <span style="font-size:13px;font-weight:600">${d.rating}</span>
           <span style="font-size:12px;color:var(--ink4)">(${d.reviews} reviews)</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:12px;margin-left:8px;font-weight:600;color:${d.status==='available'?'var(--green)':d.status==='busy'?'var(--amber)':'var(--coral)'}">
+          <span style="display:flex;align-items:center;gap:4px;font-size:12px;margin-left:8px;font-weight:600;color:${d.status===`available`?`var(--green)`:d.status===`busy`?`var(--amber)`:`var(--coral)`}">
             <span style="width:7px;height:7px;border-radius:50%;background:${onlineDot};display:inline-block"></span>
             ${statusTxt}
           </span>
@@ -677,54 +377,30 @@ function showDetail(d) {
 
     <div class="slots-label">🏥 Clinic slots today</div>
     <div class="slots-grid">
-      ${d.slots.map((s,i) => `<div class="slot ${i===0&&s==='Now'?'sel':''}" onclick="selectSlot(this,'clinic')">${s==='Now'?'Now ✓':s}</div>`).join('')}
+      ${d.slots.map((s,i)=>`<div class="slot ${i===0&&s===`Now`?`sel`:``}" onclick="selectSlot(this,'clinic')">${s===`Now`?`Now ✓`:s}</div>`).join(``)}
     </div>
 
-    ${d.tele ? `
-    <div class="slots-label" style="margin-top:4px">📹 Tele-consult slots${d.status==='away'?' (available remotely)':''}</div>
+    ${d.tele?`
+    <div class="slots-label" style="margin-top:4px">📹 Tele-consult slots${d.status===`away`?` (available remotely)`:``}</div>
     <div class="slots-grid">
-      ${d.teleSlots.map((s,i) => `<div class="slot ${i===0&&s==='Now'?'sel':''}" onclick="selectSlot(this,'tele')">${s==='Now'?'Now ✓':s}</div>`).join('')}
-    </div>` : `
+      ${d.teleSlots.map((s,i)=>`<div class="slot ${i===0&&s===`Now`?`sel`:``}" onclick="selectSlot(this,'tele')">${s===`Now`?`Now ✓`:s}</div>`).join(``)}
+    </div>`:`
     <div style="padding:10px;background:var(--cream2);border-radius:9px;font-size:12px;color:var(--ink3);margin-bottom:10px">
       📹 This doctor is not available for tele-consultation. Book a clinic or home visit.
     </div>`}
 
     <div class="detail-actions" style="margin-top:10px">
       <button class="dbtn-book" onclick="openBooking(${d.id},'clinic')">🏥 Book Clinic Visit</button>
-      <button class="dbtn-tele ${!d.tele?'off':''}" onclick="${d.tele?`openBooking(${d.id},'tele')`:'showToast(\"Not available for tele-consult\",2000)'}">📹 Tele-consult</button>
+      <button class="dbtn-tele ${d.tele?``:`off`}" onclick="${d.tele?`openBooking(${d.id},'tele')`:`showToast("Not available for tele-consult",2000)`}">📹 Tele-consult</button>
       <button class="dbtn-ai" onclick="openChatForDoc(${d.id})">🤖 AI</button>
     </div>
-  `;
-
-  panel.classList.remove('collapsed');
-}
-
-function closeDetail() {
-  document.getElementById('detail-panel').classList.add('collapsed');
-  selectedDoc = null;
-  document.querySelectorAll('.doc-card,.map-pin').forEach(el => el.classList.remove('selected'));
-}
-
-function selectSlot(el, type) {
-  el.closest('.slots-grid').querySelectorAll('.slot').forEach(s => s.classList.remove('sel'));
-  el.classList.add('sel');
-}
-
+  `,panel.classList.remove(`collapsed`)}function closeDetail(){document.getElementById(`detail-panel`).classList.add(`collapsed`),selectedDoc=null,document.querySelectorAll(`.doc-card,.map-pin`).forEach(el=>el.classList.remove(`selected`))}function selectSlot(el,type){el.closest(`.slots-grid`).querySelectorAll(`.slot`).forEach(s=>s.classList.remove(`sel`)),el.classList.add(`sel`)}
 // ═══════════════════════════════
 // BOOKING MODAL
 // ═══════════════════════════════
-function openBooking(id, type) {
-  const d = ALL_DOCTORS.find(x => x.id === id);
-  if (!d) return;
-  const isTele = type === 'tele';
-  const fee = isTele ? Math.round(d.fee * 0.8) : d.fee;
-  const slots = isTele ? d.teleSlots : d.slots;
-  const gst = Math.round(fee * 0.18);
-
-  const modal = document.getElementById('modal-box');
-  modal.innerHTML = `
+function openBooking(id,type){let d=ALL_DOCTORS.find(x=>x.id===id);if(!d)return;let isTele=type===`tele`,fee=isTele?Math.round(d.fee*.8):d.fee,slots=isTele?d.teleSlots:d.slots,gst=Math.round(fee*.18),modal=document.getElementById(`modal-box`);modal.innerHTML=`
     <div class="mhead">
-      <h3>${isTele ? '📹 Book Tele-Consult' : '🏥 Book Clinic Visit'}</h3>
+      <h3>${isTele?`📹 Book Tele-Consult`:`🏥 Book Clinic Visit`}</h3>
       <button class="mclose" onclick="closeModal()">✕</button>
     </div>
     <div class="mbody">
@@ -737,17 +413,17 @@ function openBooking(id, type) {
         <div style="margin-left:auto;font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--teal)">₹${fee}</div>
       </div>
 
-      ${isTele ? '<div style="background:var(--blue-bg);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:14px">📹 This is a video consultation. You will receive a link on WhatsApp 5 minutes before your slot.</div>' : ''}
+      ${isTele?`<div style="background:var(--blue-bg);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:14px">📹 This is a video consultation. You will receive a link on WhatsApp 5 minutes before your slot.</div>`:``}
 
       <div class="mfield" style="margin-bottom:12px">
         <label>Select Date</label>
-        <input type="date" id="bk-date" value="${new Date().toISOString().split('T')[0]}">
+        <input type="date" id="bk-date" value="${(/* @__PURE__ */ new Date()).toISOString().split(`T`)[0]}">
       </div>
 
       <div class="mfield" style="margin-bottom:12px">
         <label>Select Time Slot</label>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px">
-          ${slots.map((s,i) => `<div class="slot ${i===0?'sel':''}" onclick="document.querySelectorAll('#modal-box .slot').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${s==='Now'?'Now ✓':s}</div>`).join('')}
+          ${slots.map((s,i)=>`<div class="slot ${i===0?`sel`:``}" onclick="document.querySelectorAll('#modal-box .slot').forEach(x=>x.classList.remove('sel'));this.classList.add('sel')">${s===`Now`?`Now ✓`:s}</div>`).join(``)}
         </div>
       </div>
 
@@ -771,305 +447,53 @@ function openBooking(id, type) {
         <div class="ms-row"><span class="ms-lbl">Consultation fee</span><span class="ms-val">₹${fee}</span></div>
         <div class="ms-row"><span class="ms-lbl">GST (18%)</span><span class="ms-val">₹${gst}</span></div>
         <div class="ms-row"><span class="ms-lbl">Platform fee</span><span class="ms-val">₹0</span></div>
-        <div class="ms-row"><span class="ms-lbl" style="color:var(--ink)">Total</span><span class="ms-val" style="color:var(--teal);font-size:16px">₹${fee + gst}</span></div>
+        <div class="ms-row"><span class="ms-lbl" style="color:var(--ink)">Total</span><span class="ms-val" style="color:var(--teal);font-size:16px">₹${fee+gst}</span></div>
       </div>
 
-      <button class="mbtn ${isTele?'mbtn-tele':''}" onclick="confirmBooking('${d.name}','${isTele?'Tele-consult':'Clinic visit'}')">
-        ${isTele ? '📹 Confirm Tele-Consult & Pay' : '✅ Confirm Booking & Pay via UPI'}
+      <button class="mbtn ${isTele?`mbtn-tele`:``}" onclick="confirmBooking('${d.name}','${isTele?`Tele-consult`:`Clinic visit`}')">
+        ${isTele?`📹 Confirm Tele-Consult & Pay`:`✅ Confirm Booking & Pay via UPI`}
       </button>
     </div>
-  `;
-
-  document.getElementById('modal-ov').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('modal-ov').classList.remove('open');
-}
-
-async function confirmBooking(name, type) {
-  // Call real booking API if logged in
-  if (AROGYAAI.isLoggedIn()) {
-    const doc = ALL_DOCTORS.find(d => d.name === name);
-    const dateEl = document.getElementById('bk-date');
-    const selSlot = document.querySelector('#modal-content .slot.sel');
-    if (doc) {
-      await AROGYAAI.bookAppointment({
-        doctor_id: doc.id || name,
-        date: dateEl ? dateEl.value : new Date().toISOString().split('T')[0],
-        time: selSlot ? selSlot.textContent.trim() : '10:00',
-        type: type.toLowerCase().includes('tele') ? 'tele' : 'clinic',
-        reason: document.querySelector('#modal-content textarea')?.value || ''
-      });
-    }
-  }
-  // Then show confirmation UI
-  
-  closeModal();
-  setTimeout(() => {
-    const modal = document.getElementById('modal-box');
-    modal.innerHTML = `
+  `,document.getElementById(`modal-ov`).classList.add(`open`)}function closeModal(){document.getElementById(`modal-ov`).classList.remove(`open`)}async function confirmBooking(name,type){
+// Call real booking API if logged in
+if(AROGYAAI.isLoggedIn()){let doc=ALL_DOCTORS.find(d=>d.name===name),dateEl=document.getElementById(`bk-date`),selSlot=document.querySelector(`#modal-content .slot.sel`);doc&&await AROGYAAI.bookAppointment({doctor_id:doc.id||name,date:dateEl?dateEl.value:(/* @__PURE__ */ new Date()).toISOString().split(`T`)[0],time:selSlot?selSlot.textContent.trim():`10:00`,type:type.toLowerCase().includes(`tele`)?`tele`:`clinic`,reason:document.querySelector(`#modal-content textarea`)?.value||``})}closeModal(),setTimeout(()=>{let modal=document.getElementById(`modal-box`);modal.innerHTML=`
       <div style="text-align:center;padding:40px 24px">
         <div style="font-size:56px;margin-bottom:16px">🎉</div>
         <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px">Booking Confirmed!</div>
         <p style="font-size:14px;color:var(--ink3);line-height:1.6;margin-bottom:20px">${type} with <strong>${name}</strong> has been booked.<br>You'll receive a WhatsApp confirmation shortly.</p>
         <div style="background:var(--teal-bg);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left;font-size:13px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--ink3)">Booking ID</span><span style="font-weight:600">#ARG${Math.floor(Math.random()*9000+1000)}</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--ink3)">Booking ID</span><span style="font-weight:600">#ARG${Math.floor(Math.random()*9e3+1e3)}</span></div>
           <div style="display:flex;justify-content:space-between"><span style="color:var(--ink3)">WhatsApp alert</span><span style="color:var(--green);font-weight:600">✅ Sent</span></div>
         </div>
         <button class="mbtn" onclick="closeModal()">Done</button>
-      </div>`;
-    document.getElementById('modal-ov').classList.add('open');
-  }, 100);
-}
-
+      </div>`,document.getElementById(`modal-ov`).classList.add(`open`)},100)}
 // ═══════════════════════════════
 // SEARCH & FILTER
 // ═══════════════════════════════
-function handleSearch(val) {
-  const clear = document.getElementById('search-clear');
-  clear.classList.toggle('show', val.length > 0);
-  applyFilters(val);
-}
-
-function clearSearch() {
-  document.getElementById('search-inp').value = '';
-  document.getElementById('search-clear').classList.remove('show');
-  applyFilters('');
-}
-
-function setFilter(type, el) {
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  activeFilter = type;
-  applyFilters(document.getElementById('search-inp').value);
-}
-
-function applyFilters(search='') {
-  let list = [...ALL_DOCTORS].filter(d => d.city === currentCity);
-  const q = search.toLowerCase().trim();
-  if (q) list = list.filter(d =>
-    d.name.toLowerCase().includes(q) ||
-    d.spec.toLowerCase().includes(q) ||
-    d.area.toLowerCase().includes(q) ||
-    d.qual.toLowerCase().includes(q)
-  );
-  if (activeFilter === 'available') list = list.filter(d => d.status === 'available');
-  else if (activeFilter === 'tele') list = list.filter(d => d.tele);
-  else if (activeFilter === 'clinic') list = list.filter(d => d.clinic);
-  else if (activeFilter === 'home') list = list.filter(d => d.home);
-  else if (activeFilter === 'genmedicine') list = list.filter(d => d.spec === 'General Medicine');
-  else if (activeFilter === 'cardiology') list = list.filter(d => d.spec === 'Cardiology');
-  else if (activeFilter === 'dermatology') list = list.filter(d => d.spec === 'Dermatology');
-  else if (activeFilter === 'pediatrics') list = list.filter(d => d.spec === 'Pediatrics');
-  else if (activeFilter === 'ortho') list = list.filter(d => d.spec === 'Orthopaedics');
-  doctors = list;
-  renderDoctors(list);
-}
-
-function sortDoctors(by) {
-  let list = [...doctors];
-  if (by === 'distance') list.sort((a,b) => a.dist - b.dist);
-  else if (by === 'rating') list.sort((a,b) => b.rating - a.rating);
-  else if (by === 'fee') list.sort((a,b) => a.fee - b.fee);
-  else if (by === 'available') list.sort((a,b) => (a.status==='available'?0:1) - (b.status==='available'?0:1));
-  renderDoctors(list);
-}
-
+function handleSearch(val){document.getElementById(`search-clear`).classList.toggle(`show`,val.length>0),applyFilters(val)}function clearSearch(){document.getElementById(`search-inp`).value=``,document.getElementById(`search-clear`).classList.remove(`show`),applyFilters(``)}function setFilter(type,el){document.querySelectorAll(`.filter-chip`).forEach(c=>c.classList.remove(`active`)),el.classList.add(`active`),activeFilter=type,applyFilters(document.getElementById(`search-inp`).value)}function applyFilters(search=``){let list=[...ALL_DOCTORS].filter(d=>d.city===currentCity),q=search.toLowerCase().trim();q&&(list=list.filter(d=>d.name.toLowerCase().includes(q)||d.spec.toLowerCase().includes(q)||d.area.toLowerCase().includes(q)||d.qual.toLowerCase().includes(q))),activeFilter===`available`?list=list.filter(d=>d.status===`available`):activeFilter===`tele`?list=list.filter(d=>d.tele):activeFilter===`clinic`?list=list.filter(d=>d.clinic):activeFilter===`home`?list=list.filter(d=>d.home):activeFilter===`genmedicine`?list=list.filter(d=>d.spec===`General Medicine`):activeFilter===`cardiology`?list=list.filter(d=>d.spec===`Cardiology`):activeFilter===`dermatology`?list=list.filter(d=>d.spec===`Dermatology`):activeFilter===`pediatrics`?list=list.filter(d=>d.spec===`Pediatrics`):activeFilter===`ortho`&&(list=list.filter(d=>d.spec===`Orthopaedics`)),doctors=list,renderDoctors(list)}function sortDoctors(by){let list=[...doctors];by===`distance`?list.sort((a,b)=>a.dist-b.dist):by===`rating`?list.sort((a,b)=>b.rating-a.rating):by===`fee`?list.sort((a,b)=>a.fee-b.fee):by===`available`&&list.sort((a,b)=>(a.status===`available`?0:1)-(b.status===`available`?0:1)),renderDoctors(list)}
 // ═══════════════════════════════
 // CITY SWITCHER
 // ═══════════════════════════════
-let cityPanelOpen = false;
-function toggleCityPanel() {
-  cityPanelOpen = !cityPanelOpen;
-  document.getElementById('city-bar').style.display = cityPanelOpen ? 'block' : 'none';
-}
-
-function setCity(city, el) {
-  currentCity = city;
-  document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('loc-text').textContent = `Showing doctors in ${city}`;
-  document.getElementById('loc-city').textContent = city + ', India';
-  // For demo, Chennai has all 8 doctors; other cities show 2-4
-  if (city !== 'Chennai') {
-    const subset = ALL_DOCTORS.slice(0,3).map(d => ({...d, city, dist: +(Math.random()*5+0.5).toFixed(1)}));
-    renderDoctors(subset);
-    document.getElementById('doc-count').textContent = subset.length;
-    showToast(`📍 Showing doctors in ${city}`, 2000);
-  } else {
-    applyFilters(document.getElementById('search-inp').value);
-  }
-  cityPanelOpen = false;
-  document.getElementById('city-bar').style.display = 'none';
-}
-
+let cityPanelOpen=!1;function toggleCityPanel(){cityPanelOpen=!cityPanelOpen,document.getElementById(`city-bar`).style.display=cityPanelOpen?`block`:`none`}function setCity(city,el){
+// For demo, Chennai has all 8 doctors; other cities show 2-4
+if(currentCity=city,document.querySelectorAll(`.city-btn`).forEach(b=>b.classList.remove(`active`)),el.classList.add(`active`),document.getElementById(`loc-text`).textContent=`Showing doctors in ${city}`,document.getElementById(`loc-city`).textContent=city+`, India`,city!==`Chennai`){let subset=ALL_DOCTORS.slice(0,3).map(d=>({...d,city,dist:+(Math.random()*5+.5).toFixed(1)}));renderDoctors(subset),document.getElementById(`doc-count`).textContent=subset.length,showToast(`📍 Showing doctors in ${city}`,2e3)}else applyFilters(document.getElementById(`search-inp`).value);cityPanelOpen=!1,document.getElementById(`city-bar`).style.display=`none`}
 // ═══════════════════════════════
 // LOCATION
 // ═══════════════════════════════
-function locateMe() {
-  document.getElementById('loc-text').textContent = 'Detecting your location...';
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai';
-        document.getElementById('loc-city').textContent = 'Using GPS · 13.0827° N, 80.2707° E';
-        showToast('📍 Location updated!', 2000);
-      },
-      () => {
-        document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai (default)';
-        document.getElementById('loc-city').textContent = 'Location access denied — using default';
-      }
-    );
-  } else {
-    document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai (default)';
-  }
-}
-
+function locateMe(){document.getElementById(`loc-text`).textContent=`Detecting your location...`,navigator.geolocation?navigator.geolocation.getCurrentPosition(pos=>{document.getElementById(`loc-text`).textContent=`Anna Nagar, Chennai`,document.getElementById(`loc-city`).textContent=`Using GPS · 13.0827° N, 80.2707° E`,showToast(`📍 Location updated!`,2e3)},()=>{document.getElementById(`loc-text`).textContent=`Anna Nagar, Chennai (default)`,document.getElementById(`loc-city`).textContent=`Location access denied — using default`}):document.getElementById(`loc-text`).textContent=`Anna Nagar, Chennai (default)`}
 // ═══════════════════════════════
 // AI CHAT
 // ═══════════════════════════════
-function openChat() {
-  document.getElementById('chat-overlay').classList.add('open');
-  document.getElementById('ai-fab').style.display = 'none';
-}
-function closeChat() {
-  document.getElementById('chat-overlay').classList.remove('open');
-  document.getElementById('ai-fab').style.display = 'flex';
-}
-function openChatForDoc(id) {
-  const d = ALL_DOCTORS.find(x => x.id === id);
-  openChat();
-  setTimeout(() => addAIMsg(`I can see you're looking at <strong>${d.name}</strong> (${d.spec}). What would you like to know? I can help you decide if this doctor is right for your symptoms, or suggest alternatives.`), 300);
-}
-
-function qs(text) {
-  document.getElementById('chat-inp').value = text;
-  sendChat();
-}
-
-async function sendChat() {
-  const inp = document.getElementById('chat-inp');
-  const text = inp.value.trim();
-  if (!text) return;
-  inp.value = '';
-  addUserMsg(text);
-  showTyping();
-
-  const ctx = `You are ArogyaAI's location-based doctor finder assistant. The user is in Chennai. 
-Available doctors nearby: ${ALL_DOCTORS.slice(0,6).map(d=>`${d.name} (${d.spec}, ${d.dist}km, ₹${d.fee}, ${d.status==='available'?'available now':'busy'}, tele: ${d.tele?'yes':'no'})`).join('; ')}.
-Help the user find the right doctor based on symptoms or preferences. Recommend specific doctors from the list with reasoning. Mention tele-consult option if doctor is unavailable in person. Keep responses concise and helpful. Always end with a suggested action (book clinic, tele-consult, etc).`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:600,
-        system:ctx,
-        messages:[...chatHistory.map(m=>({role:m.r,content:m.t})),{role:'user',content:text}]
-      })
-    });
-    removeTyping();
-    if (res.ok) {
-      const data = await res.json();
-      const reply = data.content[0].text;
-      chatHistory.push({r:'user',t:text},{r:'assistant',t:reply});
-      addAIMsg(reply);
-    } else { fallbackChat(text); }
-  } catch(e) { removeTyping(); fallbackChat(text); }
-}
-
-function fallbackChat(text) {
-  const lc = text.toLowerCase();
-  let reply = '';
-  if (lc.includes('fever') || lc.includes('cold') || lc.includes('cough')) {
-    reply = `For fever and related symptoms, I recommend <strong>Dr. Priya Sharma</strong> (General Medicine, 1.2km away) — she's available right now and highly rated at 4.9★.<br><br>She offers both clinic visits (₹500) and tele-consult. Since she's nearby, would you prefer a clinic visit or tele-consult?`;
-  } else if (lc.includes('skin') || lc.includes('rash') || lc.includes('acne')) {
-    reply = `For skin issues, <strong>Dr. Kavya Nair</strong> (Dermatology) is your closest specialist at just 0.8km! She's available now and also does home visits.<br><br>She can assess rashes and skin conditions via tele-consult if you'd like to share photos first. Clinic fee is ₹600.`;
-  } else if (lc.includes('chest') || lc.includes('heart') || lc.includes('bp')) {
-    reply = `⚠️ Chest pain should be evaluated promptly. <strong>Dr. Arun Mehta</strong> (Cardiology, Fortis Hospital) is 2.1km away with slots available today.<br><br>If you're experiencing severe symptoms, please call 108 immediately. Otherwise, I'd recommend booking an urgent tele-consult now — Dr. Mehta has a slot at 11:00 AM.`;
-  } else if (lc.includes('child') || lc.includes('baby') || lc.includes('kid')) {
-    reply = `For children's health, <strong>Dr. Raj Singh</strong> (Pediatrics, Rainbow Children Hospital) is excellent — rated 4.9★ with 15 years experience. He's 3.4km away with clinic slots today.<br><br>Note: Dr. Raj doesn't do tele-consult, so a clinic visit is recommended for children.`;
-  } else if (lc.includes('tele') || lc.includes('video') || lc.includes('online')) {
-    const teleDoc = ALL_DOCTORS.filter(d => d.tele && d.status === 'available');
-    reply = `Great choice! These doctors are available for tele-consult right now:<br><br><strong>• Dr. Priya Sharma</strong> (Gen. Medicine) — Available Now, ₹400<br><strong>• Dr. Kavya Nair</strong> (Dermatology) — Available Now, ₹480<br><strong>• Dr. Sneha Iyer</strong> (Gynaecology) — Available Now, ₹560<br><br>Which specialty do you need?`;
-  } else {
-    reply = `I can help you find the right doctor nearby! Could you tell me:<br><br>1. What symptoms are you experiencing?<br>2. Do you prefer a clinic visit or tele-consult?<br>3. Any preferred language?<br><br>We have <strong>8 verified doctors</strong> within 5km of you right now.`;
-  }
-  addAIMsg(reply);
-}
-
-function addAIMsg(html) {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = 'cmsg ai';
-  div.innerHTML = `<div class="cbub">${html}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-function addUserMsg(text) {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = 'cmsg user';
-  div.innerHTML = `<div class="cbub">${text}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-function showTyping() {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = 'cmsg ai'; div.id = 'typing';
-  div.innerHTML = `<div class="typing-row"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-function removeTyping() {
-  const t = document.getElementById('typing');
-  if (t) t.remove();
-}
-
+function openChat(){document.getElementById(`chat-overlay`).classList.add(`open`),document.getElementById(`ai-fab`).style.display=`none`}function closeChat(){document.getElementById(`chat-overlay`).classList.remove(`open`),document.getElementById(`ai-fab`).style.display=`flex`}function openChatForDoc(id){let d=ALL_DOCTORS.find(x=>x.id===id);openChat(),setTimeout(()=>addAIMsg(`I can see you're looking at <strong>${d.name}</strong> (${d.spec}). What would you like to know? I can help you decide if this doctor is right for your symptoms, or suggest alternatives.`),300)}function qs(text){document.getElementById(`chat-inp`).value=text,sendChat()}async function sendChat(){let inp=document.getElementById(`chat-inp`),text=inp.value.trim();if(!text)return;inp.value=``,addUserMsg(text),showTyping();let ctx=`You are ArogyaAI's location-based doctor finder assistant. The user is in Chennai. 
+Available doctors nearby: ${ALL_DOCTORS.slice(0,6).map(d=>`${d.name} (${d.spec}, ${d.dist}km, ₹${d.fee}, ${d.status===`available`?`available now`:`busy`}, tele: ${d.tele?`yes`:`no`})`).join(`; `)}.
+Help the user find the right doctor based on symptoms or preferences. Recommend specific doctors from the list with reasoning. Mention tele-consult option if doctor is unavailable in person. Keep responses concise and helpful. Always end with a suggested action (book clinic, tele-consult, etc).`;try{let res=await fetch(`https://api.anthropic.com/v1/messages`,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify({model:`claude-sonnet-4-20250514`,max_tokens:600,system:ctx,messages:[...chatHistory.map(m=>({role:m.r,content:m.t})),{role:`user`,content:text}]})});if(removeTyping(),res.ok){let reply=(await res.json()).content[0].text;chatHistory.push({r:`user`,t:text},{r:`assistant`,t:reply}),addAIMsg(reply)}else fallbackChat(text)}catch{removeTyping(),fallbackChat(text)}}function fallbackChat(text){let lc=text.toLowerCase(),reply=``;if(lc.includes(`fever`)||lc.includes(`cold`)||lc.includes(`cough`))reply=`For fever and related symptoms, I recommend <strong>Dr. Priya Sharma</strong> (General Medicine, 1.2km away) — she's available right now and highly rated at 4.9★.<br><br>She offers both clinic visits (₹500) and tele-consult. Since she's nearby, would you prefer a clinic visit or tele-consult?`;else if(lc.includes(`skin`)||lc.includes(`rash`)||lc.includes(`acne`))reply=`For skin issues, <strong>Dr. Kavya Nair</strong> (Dermatology) is your closest specialist at just 0.8km! She's available now and also does home visits.<br><br>She can assess rashes and skin conditions via tele-consult if you'd like to share photos first. Clinic fee is ₹600.`;else if(lc.includes(`chest`)||lc.includes(`heart`)||lc.includes(`bp`))reply=`⚠️ Chest pain should be evaluated promptly. <strong>Dr. Arun Mehta</strong> (Cardiology, Fortis Hospital) is 2.1km away with slots available today.<br><br>If you're experiencing severe symptoms, please call 108 immediately. Otherwise, I'd recommend booking an urgent tele-consult now — Dr. Mehta has a slot at 11:00 AM.`;else if(lc.includes(`child`)||lc.includes(`baby`)||lc.includes(`kid`))reply=`For children's health, <strong>Dr. Raj Singh</strong> (Pediatrics, Rainbow Children Hospital) is excellent — rated 4.9★ with 15 years experience. He's 3.4km away with clinic slots today.<br><br>Note: Dr. Raj doesn't do tele-consult, so a clinic visit is recommended for children.`;else if(lc.includes(`tele`)||lc.includes(`video`)||lc.includes(`online`)){let teleDoc=ALL_DOCTORS.filter(d=>d.tele&&d.status===`available`);reply=`Great choice! These doctors are available for tele-consult right now:<br><br><strong>• Dr. Priya Sharma</strong> (Gen. Medicine) — Available Now, ₹400<br><strong>• Dr. Kavya Nair</strong> (Dermatology) — Available Now, ₹480<br><strong>• Dr. Sneha Iyer</strong> (Gynaecology) — Available Now, ₹560<br><br>Which specialty do you need?`}else reply=`I can help you find the right doctor nearby! Could you tell me:<br><br>1. What symptoms are you experiencing?<br>2. Do you prefer a clinic visit or tele-consult?<br>3. Any preferred language?<br><br>We have <strong>8 verified doctors</strong> within 5km of you right now.`;addAIMsg(reply)}function addAIMsg(html){let msgs=document.getElementById(`chat-msgs`),div=document.createElement(`div`);div.className=`cmsg ai`,div.innerHTML=`<div class="cbub">${html}</div>`,msgs.appendChild(div),msgs.scrollTop=msgs.scrollHeight}function addUserMsg(text){let msgs=document.getElementById(`chat-msgs`),div=document.createElement(`div`);div.className=`cmsg user`,div.innerHTML=`<div class="cbub">${text}</div>`,msgs.appendChild(div),msgs.scrollTop=msgs.scrollHeight}function showTyping(){let msgs=document.getElementById(`chat-msgs`),div=document.createElement(`div`);div.className=`cmsg ai`,div.id=`typing`,div.innerHTML=`<div class="typing-row"><div class="td"></div><div class="td"></div><div class="td"></div></div>`,msgs.appendChild(div),msgs.scrollTop=msgs.scrollHeight}function removeTyping(){let t=document.getElementById(`typing`);t&&t.remove()}
 // ═══════════════════════════════
 // TOAST
 // ═══════════════════════════════
-let toastTimer;
-function showToast(msg, dur=3000) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('show'), dur);
-}
-
+let toastTimer;function showToast(msg,dur=3e3){let toast=document.getElementById(`toast`);toast.textContent=msg,toast.classList.add(`show`),clearTimeout(toastTimer),toastTimer=setTimeout(()=>toast.classList.remove(`show`),dur)}
 // ═══════════════════════════════
 // INIT
 // ═══════════════════════════════
-window.onload = () => {
-  // Simulate location detection
-  setTimeout(() => {
-    document.getElementById('loc-text').textContent = 'Anna Nagar, Chennai';
-    document.getElementById('loc-city').textContent = 'GPS · 13.0827° N, 80.2707° E';
-  }, 800);
-
-  renderDoctors(ALL_DOCTORS);
-
-  // Auto-open chat after 3s with a nudge
-  setTimeout(() => {
-    showToast('🤖 Ask our AI to find the right doctor for your symptoms!', 4000);
-  }, 2500);
-};
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/arogyaai/sw.js')
-      .then(function(reg) { console.log('ArogyaAI SW ready'); })
-      .catch(function(e) { console.warn('SW not registered:', e); });
-  });
-}
-</script>
-
-</body>
-</html>
+window.onload=()=>{
+// Auto-open chat after 3s with a nudge
+setTimeout(()=>{document.getElementById(`loc-text`).textContent=`Anna Nagar, Chennai`,document.getElementById(`loc-city`).textContent=`GPS · 13.0827° N, 80.2707° E`},800),renderDoctors(ALL_DOCTORS),setTimeout(()=>{showToast(`🤖 Ask our AI to find the right doctor for your symptoms!`,4e3)},2500)};</script><script>`serviceWorker`in navigator&&window.addEventListener(`load`,function(){navigator.serviceWorker.register(`/arogyaai/sw.js`).then(function(reg){console.log(`ArogyaAI SW ready`)}).catch(function(e){console.warn(`SW not registered:`,e)})});</script></body></html>
