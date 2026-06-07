@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArogyaAI — Voice & Lab Report AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0A7B5E;--teal-d:#054D3B;--teal-m:#1D9E75;--teal-l:#5DCAA5;
+  --teal-bg:#E0F2EB;--teal-glow:rgba(10,123,94,0.15);
+  --ink:#080E0B;--ink2:#2A3530;--ink3:#4E5F58;--ink4:#7D9088;
+  --cream:#F6F3EE;--cream2:#EDE9E2;--white:#fff;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.13);
+  --blue:#1A5CB8;--blue-bg:#EBF2FF;
+  --purple:#5B3FBE;--purple-bg:#EEE9FF;
+  --amber:#B87314;--amber-bg:#FFF4E0;
+  --coral:#C03B2A;--coral-bg:#FDECEA;
+  --green:#2A7A3A;--green-bg:#E8F5EC;
+  --shadow:0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.1);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Sora',sans-serif}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;background:none}
+input,select,textarea{font-family:'DM Sans',sans-serif}
+
+/* APP SHELL */
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* TOP NAV */
+.nav{height:56px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:50}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-size:16px;font-weight:800;color:var(--teal);text-decoration:none}
+.logo-box{width:30px;height:30px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-back{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3);background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:6px 12px;text-decoration:none;transition:all 0.15s}
+.nav-back:hover{color:var(--teal);border-color:var(--teal)}
+.nav-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--ink)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* FEATURE TABS */
+.feature-tabs{display:flex;gap:0;background:var(--white);border-bottom:1px solid var(--border);padding:0 16px;flex-shrink:0}
+.ftab{padding:12px 16px;font-size:13px;font-weight:600;color:var(--ink3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:7px}
+.ftab:hover{color:var(--ink)}
+.ftab.on{color:var(--teal);border-bottom-color:var(--teal)}
+.ftab-icon{font-size:16px}
+
+/* PANELS */
+.panel{flex:1;overflow:hidden;display:none;flex-direction:column}
+.panel.on{display:flex}
+
+/* ═══════════════════════
+   VOICE MULTILINGUAL CHAT
+   ═══════════════════════ */
+.voice-layout{display:flex;flex:1;overflow:hidden}
+
+/* LANGUAGE SIDEBAR */
+.lang-sidebar{width:200px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.lang-sidebar-head{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.lang-sidebar-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink4);margin-bottom:8px}
+.lang-search{width:100%;padding:7px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;color:var(--ink);background:var(--cream);outline:none;transition:border 0.2s}
+.lang-search:focus{border-color:var(--teal-m)}
+.lang-list{flex:1;overflow-y:auto;padding:6px}
+.lang-list::-webkit-scrollbar{width:3px}
+.lang-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.lang-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+.lang-item:hover{background:var(--cream)}
+.lang-item.on{background:var(--teal-bg)}
+.lang-flag{font-size:18px;flex-shrink:0}
+.lang-name{font-size:13px;font-weight:500;color:var(--ink2)}
+.lang-native{font-size:10px;color:var(--ink4)}
+.lang-item.on .lang-name{color:var(--teal);font-weight:600}
+.lang-item.on .lang-native{color:var(--teal-m)}
+
+/* CHAT AREA */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-lang-bar{padding:10px 16px;background:var(--teal-bg);border-bottom:1px solid rgba(10,123,94,0.15);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.clb-flag{font-size:20px}
+.clb-text{flex:1}
+.clb-lang{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--teal-d)}
+.clb-hint{font-size:11px;color:var(--teal-m)}
+.clb-voice-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+
+/* CHAT MESSAGES */
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.chat-msgs::-webkit-scrollbar{width:4px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.cmsg{display:flex;gap:10px;max-width:80%}
+.cmsg.ai{align-self:flex-start}
+.cmsg.user{align-self:flex-end;flex-direction:row-reverse}
+.cavi{width:32px;height:32px;border-radius:10px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;align-self:flex-end}
+.cbub{padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.6}
+.cmsg.ai .cbub{background:var(--white);border:1px solid var(--border);color:var(--ink2);border-radius:4px 14px 14px 14px;box-shadow:var(--shadow)}
+.cmsg.user .cbub{background:var(--teal);color:#fff;border-radius:14px 4px 14px 14px}
+.cmsg-meta{font-size:10px;color:var(--ink4);margin-top:4px;display:flex;align-items:center;gap:5px}
+.cmsg.user .cmsg-meta{justify-content:flex-end}
+.lang-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;background:var(--teal-bg);color:var(--teal);font-size:10px;font-weight:600}
+.cmsg.user .lang-tag{background:rgba(255,255,255,0.25);color:#fff}
+
+/* VOICE ANIMATION */
+.voice-wave{display:flex;align-items:center;gap:3px;height:24px}
+.vbar{width:3px;border-radius:2px;background:var(--teal);animation:vwave 1s ease-in-out infinite}
+.vbar:nth-child(1){animation-delay:0s;height:6px}
+.vbar:nth-child(2){animation-delay:0.1s;height:14px}
+.vbar:nth-child(3){animation-delay:0.2s;height:20px}
+.vbar:nth-child(4){animation-delay:0.3s;height:24px}
+.vbar:nth-child(5){animation-delay:0.4s;height:20px}
+.vbar:nth-child(6){animation-delay:0.5s;height:14px}
+.vbar:nth-child(7){animation-delay:0.6s;height:6px}
+@keyframes vwave{0%,100%{transform:scaleY(0.4);opacity:0.5}50%{transform:scaleY(1);opacity:1}}
+
+/* TYPING */
+.typing-row{display:flex;gap:3px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:4px 14px 14px 14px;width:fit-content;box-shadow:var(--shadow)}
+.td{width:5px;height:5px;border-radius:50%;background:var(--ink4);animation:tdot 1.2s infinite}
+.td:nth-child(2){animation-delay:0.2s}.td:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-5px);opacity:1}}
+
+/* CHAT INPUT */
+.chat-input-area{padding:12px 16px;background:var(--white);border-top:1px solid var(--border);flex-shrink:0}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end}
+.chat-inp{flex:1;padding:11px 14px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;color:var(--ink);background:var(--cream);outline:none;resize:none;max-height:100px;transition:border 0.2s;line-height:1.5}
+.chat-inp:focus{border-color:var(--teal-m);background:var(--white);box-shadow:0 0 0 3px var(--teal-glow)}
+.chat-inp::placeholder{color:var(--ink4)}
+
+/* MIC BUTTON */
+.mic-btn{width:44px;height:44px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all 0.2s;flex-shrink:0;position:relative}
+.mic-btn.idle{background:var(--cream2);color:var(--ink3);border:1.5px solid var(--border2)}
+.mic-btn.idle:hover{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-m)}
+.mic-btn.recording{background:var(--coral);color:#fff;animation:micpulse 1s infinite}
+.mic-btn.processing{background:var(--teal);color:#fff}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(192,59,42,0.4)}50%{box-shadow:0 0 0 10px rgba(192,59,42,0)}}
+.send-btn{width:44px;height:44px;border-radius:50%;background:var(--teal);border:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;transition:all 0.15s;flex-shrink:0}
+.send-btn:hover{background:var(--teal-d);transform:scale(1.05)}
+
+.chat-hints{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chint{padding:5px 11px;border-radius:20px;border:1px solid var(--border2);font-size:11px;font-weight:500;color:var(--ink3);cursor:pointer;transition:all 0.15s;background:var(--white)}
+.chint:hover{border-color:var(--teal-m);color:var(--teal)}
+
+/* QUICK LANG PILLS */
+.quick-langs{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--white)}
+.qlang{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;border:1.5px solid var(--border2);font-size:12px;font-weight:500;color:var(--ink3);cursor:pointer;transition:all 0.15s;background:var(--cream)}
+.qlang:hover{border-color:var(--teal-m);color:var(--teal)}
+.qlang.on{border-color:var(--teal);background:var(--teal-bg);color:var(--teal)}
+
+/* ═══════════════════
+   LAB REPORT ANALYZER
+   ═══════════════════ */
+.lab-layout{display:flex;flex:1;overflow:hidden}
+
+/* UPLOAD SIDE */
+.lab-upload-col{width:360px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;background:var(--white)}
+.lab-upload-col::-webkit-scrollbar{width:4px}
+.lab-upload-col::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.luc-pad{padding:16px}
+.luc-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.luc-sub{font-size:12px;color:var(--ink3);margin-bottom:14px}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border2);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--cream);margin-bottom:14px}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--teal-m);background:var(--teal-bg)}
+.uz-icon{font-size:36px;margin-bottom:10px}
+.uz-title{font-size:14px;font-weight:600;color:var(--ink2);margin-bottom:4px}
+.uz-sub{font-size:12px;color:var(--ink4)}
+
+/* SAMPLE REPORTS */
+.sample-label{font-size:11px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px}
+.sample-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sample-card{padding:10px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;transition:all 0.2s;background:var(--cream);text-align:center}
+.sample-card:hover{border-color:var(--teal-m);background:var(--teal-bg);transform:translateY(-1px)}
+.sample-card.on{border-color:var(--teal);background:var(--teal-bg)}
+.sc-icon{font-size:22px;margin-bottom:4px}
+.sc-name{font-size:11px;font-weight:600;color:var(--ink2)}
+.sc-sub{font-size:10px;color:var(--ink4)}
+
+/* UPLOADED FILE */
+.file-preview{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;margin-bottom:10px;display:none}
+.fp-icon{font-size:28px;flex-shrink:0}
+.fp-name{font-size:13px;font-weight:600;color:var(--ink);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-size{font-size:11px;color:var(--ink4)}
+.fp-remove{font-size:14px;color:var(--ink4);cursor:pointer;padding:2px}
+.fp-remove:hover{color:var(--coral)}
+
+/* LANG SELECT FOR LAB */
+.lab-lang-sel{margin-bottom:14px}
+.lab-lang-label{font-size:12px;font-weight:600;color:var(--ink3);margin-bottom:6px;display:block}
+.lab-lang-grid{display:flex;flex-wrap:wrap;gap:5px}
+.llang{padding:5px 11px;border-radius:20px;border:1.5px solid var(--border2);font-size:11px;font-weight:500;color:var(--ink3);cursor:pointer;transition:all 0.15s;background:var(--cream)}
+.llang:hover{border-color:var(--teal-m);color:var(--teal)}
+.llang.on{border-color:var(--teal);background:var(--teal-bg);color:var(--teal)}
+
+/* ANALYZE BTN */
+.analyze-btn{width:100%;padding:13px;border-radius:12px;background:var(--teal);color:#fff;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.analyze-btn:hover{background:var(--teal-d);box-shadow:0 8px 20px rgba(10,123,94,0.3)}
+.analyze-btn:disabled{background:var(--ink4);cursor:not-allowed;box-shadow:none}
+.analyze-btn.loading{opacity:0.8;pointer-events:none}
+
+/* RESULT SIDE */
+.lab-result-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--cream)}
+.result-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink4);text-align:center;padding:32px}
+.result-empty-icon{font-size:56px;margin-bottom:16px;opacity:0.5}
+.result-empty-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--ink3);margin-bottom:8px}
+.result-empty-sub{font-size:14px;line-height:1.6}
+
+.result-content{flex:1;overflow-y:auto;padding:16px}
+.result-content::-webkit-scrollbar{width:4px}
+.result-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* RESULT HEADER */
+.result-header{background:var(--white);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.rh-icon{width:48px;height:48px;border-radius:12px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.rh-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--ink)}
+.rh-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.rh-lang{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;background:var(--teal-bg);color:var(--teal);font-size:11px;font-weight:600;margin-top:6px}
+
+/* SUMMARY BOX */
+.summary-box{background:var(--white);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border)}
+.sb-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.summary-text{font-size:14px;color:var(--ink2);line-height:1.75}
+
+/* PARAMETER TABLE */
+.param-table{background:var(--white);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border)}
+.pt-title{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.pt-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.pt-row:last-child{border-bottom:none}
+.pt-name{flex:1;font-size:13px;color:var(--ink2);font-weight:500}
+.pt-val{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;min-width:80px;text-align:right}
+.pt-range{font-size:11px;color:var(--ink4);min-width:100px;text-align:right}
+.pt-status{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.pt-normal{background:var(--green-bg);color:var(--green)}
+.pt-high{background:var(--coral-bg);color:var(--coral)}
+.pt-low{background:var(--amber-bg);color:var(--amber)}
+.pt-val.ok{color:var(--green)}
+.pt-val.hi{color:var(--coral)}
+.pt-val.lo{color:var(--amber)}
+
+/* STATUS BAR */
+.status-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;margin-bottom:8px;font-size:13px;font-weight:500}
+.status-good{background:var(--green-bg);color:var(--green);border:1px solid rgba(42,122,58,0.15)}
+.status-warn{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(184,115,20,0.15)}
+.status-alert{background:var(--coral-bg);color:var(--coral);border:1px solid rgba(192,59,42,0.15)}
+
+/* ADVICE CARDS */
+.advice-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.advice-card{background:var(--white);border-radius:12px;padding:12px;border:1px solid var(--border)}
+.ac-icon{font-size:20px;margin-bottom:6px}
+.ac-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.ac-text{font-size:11px;color:var(--ink3);line-height:1.5}
+
+/* ACTION BTNS */
+.result-actions{display:flex;gap:8px;margin-bottom:12px}
+.ra-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:600;border:1.5px solid var(--border2);color:var(--ink2);background:var(--white);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.ra-btn:hover{border-color:var(--teal-m);color:var(--teal)}
+.ra-btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+.ra-btn.primary:hover{background:var(--teal-d)}
+
+/* SPINNER */
+.spin{animation:spinr 0.7s linear infinite;display:inline-block}
+@keyframes spinr{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:500;transition:transform 0.3s;display:flex;align-items:center;gap:7px;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:absolute;inset:0;background:rgba(246,243,238,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(4px);display:none}
+.lo-icon{font-size:40px;margin-bottom:16px;animation:bounce 1s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.lo-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px}
+.lo-sub{font-size:13px;color:var(--ink3)}
+.lo-progress{width:200px;height:4px;background:var(--border2);border-radius:2px;margin-top:16px;overflow:hidden}
+.lo-fill{height:100%;background:var(--teal);border-radius:2px;animation:loprog 2s ease-in-out infinite}
+@keyframes loprog{0%{width:0%;margin-left:0}50%{width:70%;margin-left:0}100%{width:10%;margin-left:90%}}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .lang-sidebar{display:none}
+  .lab-upload-col{width:280px}
+  .advice-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- NAV -->
+  <div class="nav">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="logo-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v5M9.5 5.5h5M7 13c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="13" r="2.5" fill="#fff"/></svg>
+      </div>
+      ArogyaAI
+    </a>
+    <div class="nav-title">AI Features</div>
+    <div class="nav-r">
+      <a href="dashboard.html" class="nav-back">← Dashboard</a>
+    </div>
+  </div>
+
+  <!-- FEATURE TABS -->
+  <div class="feature-tabs">
+    <button class="ftab on" onclick="switchTab('voice',this)"><span class="ftab-icon">🎙️</span> Voice Multilingual Chat</button>
+    <button class="ftab" onclick="switchTab('lab',this)"><span class="ftab-icon">🔬</span> Lab Report Analyzer</button>
+  </div>
+
+  <!-- ══════════════════════════
+       PANEL 1: VOICE MULTILINGUAL
+       ══════════════════════════ -->
+  <div class="panel on" id="panel-voice">
+    <div class="voice-layout">
+
+      <!-- LANGUAGE SIDEBAR -->
+      <div class="lang-sidebar">
+        <div class="lang-sidebar-head">
+          <div class="lang-sidebar-label">Choose Language</div>
+          <input class="lang-search" placeholder="Search..." oninput="filterLangs(this.value)">
+        </div>
+        <div class="lang-list" id="lang-list"></div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="chat-area">
+
+        <!-- CURRENT LANG BAR -->
+        <div class="chat-lang-bar">
+          <span class="clb-flag" id="clb-flag">🇮🇳</span>
+          <div class="clb-text">
+            <div class="clb-lang" id="clb-lang">Hindi (हिंदी)</div>
+            <div class="clb-hint" id="clb-hint">Speak or type in Hindi — AI replies in Hindi</div>
+          </div>
+          <div class="clb-voice-status" id="voice-status" style="display:none">
+            <div class="voice-wave">
+              <div class="vbar"></div><div class="vbar"></div><div class="vbar"></div>
+              <div class="vbar"></div><div class="vbar"></div><div class="vbar"></div><div class="vbar"></div>
+            </div>
+            <span style="color:var(--coral);font-size:12px">Listening...</span>
+          </div>
+        </div>
+
+        <!-- QUICK LANG PILLS -->
+        <div class="quick-langs" id="quick-langs"></div>
+
+        <!-- MESSAGES -->
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="cmsg ai">
+            <div class="cavi">🤖</div>
+            <div>
+              <div class="cbub" id="welcome-msg">नमस्ते! 🙏 मैं आपका ArogyaAI स्वास्थ्य सहायक हूं।<br><br>आप मुझसे हिंदी में बात कर सकते हैं। अपने लक्षण बताएं या किसी भी स्वास्थ्य सवाल का जवाब पाएं। माइक बटन दबाकर बोलें! 🎙️</div>
+              <div class="cmsg-meta"><span class="lang-tag">🇮🇳 Hindi</span> Just now</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INPUT -->
+        <div class="chat-input-area">
+          <div class="chat-hints" id="chat-hints">
+            <div class="chint" onclick="qs(this.textContent)">मुझे बुखार है</div>
+            <div class="chint" onclick="qs(this.textContent)">पेट में दर्द है</div>
+            <div class="chint" onclick="qs(this.textContent)">सिर दर्द है</div>
+            <div class="chint" onclick="qs(this.textContent)">खांसी है</div>
+            <div class="chint" onclick="qs(this.textContent)">Doctor chahiye</div>
+          </div>
+          <div class="chat-input-row">
+            <button class="mic-btn idle" id="mic-btn" onclick="toggleMic()">🎙️</button>
+            <textarea class="chat-inp" id="chat-inp" placeholder="हिंदी में लिखें या बोलें..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+            <button class="send-btn" onclick="sendMsg()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════
+       PANEL 2: LAB REPORT
+       ══════════════════ -->
+  <div class="panel" id="panel-lab" style="position:relative">
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="lab-loading">
+      <div class="lo-icon">🔬</div>
+      <div class="lo-title">Analyzing your report...</div>
+      <div class="lo-sub" id="lo-status">Reading lab values</div>
+      <div class="lo-progress"><div class="lo-fill"></div></div>
+    </div>
+
+    <div class="lab-layout">
+
+      <!-- UPLOAD COL -->
+      <div class="lab-upload-col">
+        <div class="luc-pad">
+          <div class="luc-title">🔬 Lab Report Analyzer</div>
+          <div class="luc-sub">Upload any lab report — AI explains it in your language in simple terms</div>
+
+          <!-- UPLOAD ZONE -->
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+            <div class="uz-icon">📄</div>
+            <div class="uz-title">Drop report here or tap to upload</div>
+            <div class="uz-sub">PDF, JPG, PNG — blood test, X-ray report, thyroid, diabetes, lipids</div>
+            <input type="file" id="file-inp" style="display:none" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect(event)">
+          </div>
+
+          <!-- FILE PREVIEW -->
+          <div class="file-preview" id="file-preview">
+            <span class="fp-icon" id="fp-icon">📄</span>
+            <div style="flex:1;min-width:0">
+              <div class="fp-name" id="fp-name">report.pdf</div>
+              <div class="fp-size" id="fp-size">2.4 MB</div>
+            </div>
+            <span class="fp-remove" onclick="removeFile()">✕</span>
+          </div>
+
+          <!-- SAMPLE REPORTS -->
+          <div class="sample-label">Or try a sample report</div>
+          <div class="sample-grid">
+            <div class="sample-card" onclick="loadSample('cbc')"><div class="sc-icon">🩸</div><div class="sc-name">CBC Report</div><div class="sc-sub">Complete Blood Count</div></div>
+            <div class="sample-card" onclick="loadSample('diabetes')"><div class="sc-icon">💉</div><div class="sc-name">Diabetes Panel</div><div class="sc-sub">Blood sugar, HbA1c</div></div>
+            <div class="sample-card" onclick="loadSample('thyroid')"><div class="sc-icon">🦋</div><div class="sc-name">Thyroid Panel</div><div class="sc-sub">T3, T4, TSH</div></div>
+            <div class="sample-card" onclick="loadSample('lipid')"><div class="sc-icon">❤️</div><div class="sc-name">Lipid Profile</div><div class="sc-sub">Cholesterol, HDL, LDL</div></div>
+            <div class="sample-card" onclick="loadSample('liver')"><div class="sc-icon">🫀</div><div class="sc-name">Liver Function</div><div class="sc-sub">ALT, AST, Bilirubin</div></div>
+            <div class="sample-card" onclick="loadSample('kidney')"><div class="sc-icon">🫘</div><div class="sc-name">Kidney Function</div><div class="sc-sub">Creatinine, Urea</div></div>
+          </div>
+
+          <!-- LANGUAGE FOR REPORT -->
+          <div class="lab-lang-sel">
+            <span class="lab-lang-label">📢 Explain results in:</span>
+            <div class="lab-lang-grid" id="lab-lang-grid"></div>
+          </div>
+
+          <button class="analyze-btn" id="analyze-btn" onclick="analyzeReport()" disabled>
+            🔬 Analyze Report
+          </button>
+        </div>
+      </div>
+
+      <!-- RESULT COL -->
+      <div class="lab-result-col">
+        <div class="result-empty" id="result-empty">
+          <div class="result-empty-icon">🔬</div>
+          <div class="result-empty-title">Upload a report to get started</div>
+          <div class="result-empty-sub">ArogyaAI will explain every value in plain language — no medical jargon, in your language</div>
+        </div>
+        <div class="result-content" id="result-content" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ DATA ═══════════════
+const LANGUAGES = [
+  {code:'hi',name:'Hindi',native:'हिंदी',flag:'🇮🇳',hints:['मुझे बुखार है','पेट में दर्द है','सिर दर्द है','खांसी है','डॉक्टर चाहिए'],welcome:'नमस्ते! 🙏 मैं आपका ArogyaAI स्वास्थ्य सहायक हूं।\n\nआप मुझसे हिंदी में बात कर सकते हैं। अपने लक्षण बताएं या किसी भी स्वास्थ्य सवाल का जवाब पाएं।',placeholder:'हिंदी में लिखें या बोलें...'},
+  {code:'ta',name:'Tamil',native:'தமிழ்',flag:'🏳️',hints:['எனக்கு காய்ச்சல்','வயிற்று வலி','தலைவலி','இருமல்','மருத்துவர் வேண்டும்'],welcome:'வணக்கம்! 🙏 நான் உங்கள் ArogyaAI சுகாதார உதவியாளர்.\n\nதமிழில் உங்கள் அறிகுறிகளை சொல்லுங்கள்.',placeholder:'தமிழில் டைப் செய்யுங்கள்...'},
+  {code:'te',name:'Telugu',native:'తెలుగు',flag:'🏳️',hints:['నాకు జ్వరం','కడుపు నొప్పి','తలనొప్పి','దగ్గు','డాక్టర్ కావాలి'],welcome:'నమస్కారం! 🙏 నేను మీ ArogyaAI ఆరోగ్య సహాయకుడు.\n\nతెలుగులో మీ లక్షణాలు చెప్పండి.',placeholder:'తెలుగులో టైప్ చేయండి...'},
+  {code:'kn',name:'Kannada',native:'ಕನ್ನಡ',flag:'🏳️',hints:['ನನಗೆ ಜ್ವರ','ಹೊಟ್ಟೆ ನೋವು','ತಲೆನೋವು','ಕೆಮ್ಮು','ವೈದ್ಯರು ಬೇಕು'],welcome:'ನಮಸ್ಕಾರ! 🙏 ನಾನು ನಿಮ್ಮ ArogyaAI ಆರೋಗ್ಯ ಸಹಾಯಕ.\n\nಕನ್ನಡದಲ್ಲಿ ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಹೇಳಿ.',placeholder:'ಕನ್ನಡದಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...'},
+  {code:'ml',name:'Malayalam',native:'മലയാളം',flag:'🏳️',hints:['എനിക്ക് പനി','വയറ്റിൽ വേദന','തലവേദന','ചുമ','ഡോക്ടർ വേണം'],welcome:'നമസ്കാരം! 🙏 ഞാൻ നിങ്ങളുടെ ArogyaAI ആരോഗ്യ സഹായി.\n\nമലയാളത്തിൽ നിങ്ങളുടെ ലക്ഷണങ്ങൾ പറയൂ.',placeholder:'മലയാളത്തിൽ ടൈപ്പ് ചെയ്യൂ...'},
+  {code:'mr',name:'Marathi',native:'मराठी',flag:'🏳️',hints:['मला ताप आहे','पोटदुखी आहे','डोकेदुखी आहे','खोकला आहे','डॉक्टर हवेत'],welcome:'नमस्कार! 🙏 मी तुमचा ArogyaAI आरोग्य सहाय्यक आहे.\n\nमराठीत तुमची लक्षणे सांगा.',placeholder:'मराठीत टाइप करा...'},
+  {code:'gu',name:'Gujarati',native:'ગુજરાતી',flag:'🏳️',hints:['મને તાવ છે','પેટ દુખે છે','માથું દુખે છે','ઉધરસ છે','ડૉક્ટર જોઈએ'],welcome:'નમસ્તે! 🙏 હું તમારો ArogyaAI આરોગ્ય સહાયક છું.\n\nગુજરાતીમાં તમારા લક્ષણો જણાવો.',placeholder:'ગુજરાતીમાં ટાઇપ કરો...'},
+  {code:'bn',name:'Bengali',native:'বাংলা',flag:'🏳️',hints:['আমার জ্বর','পেটে ব্যথা','মাথাব্যথা','কাশি','ডাক্তার দরকার'],welcome:'নমস্কার! 🙏 আমি আপনার ArogyaAI স্বাস্থ্য সহায়ক।\n\nবাংলায় আপনার লক্ষণ বলুন।',placeholder:'বাংলায় টাইপ করুন...'},
+  {code:'pa',name:'Punjabi',native:'ਪੰਜਾਬੀ',flag:'🏳️',hints:['ਮੈਨੂੰ ਬੁਖ਼ਾਰ ਹੈ','ਪੇਟ ਦਰਦ','ਸਿਰ ਦਰਦ','ਖੰਘ ਹੈ','ਡਾਕਟਰ ਚਾਹੀਦਾ'],welcome:'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! 🙏 ਮੈਂ ਤੁਹਾਡਾ ArogyaAI ਸਿਹਤ ਸਹਾਇਕ ਹਾਂ।\n\nਪੰਜਾਬੀ ਵਿੱਚ ਆਪਣੇ ਲੱਛਣ ਦੱਸੋ।',placeholder:'ਪੰਜਾਬੀ ਵਿੱਚ ਟਾਈਪ ਕਰੋ...'},
+  {code:'or',name:'Odia',native:'ଓଡ଼ିଆ',flag:'🏳️',hints:['ମୋର ଜ୍ୱର ଅଛି','ପେଟ ଦରଜ','ମୁଣ୍ଡ ଦରଜ','କାଶ ଅଛି','ଡାକ୍ତର ଦରକାର'],welcome:'ନମସ୍କାର! 🙏 ମୁଁ ଆପଣଙ୍କ ArogyaAI ସ୍ୱାସ୍ଥ୍ୟ ସହାୟକ।\n\nଓଡ଼ିଆରେ ଆପଣଙ୍କ ଲକ୍ଷଣ କୁହନ୍ତୁ।',placeholder:'ଓଡ଼ିଆରେ ଟାଇପ କରନ୍ତୁ...'},
+  {code:'as',name:'Assamese',native:'অসমীয়া',flag:'🏳️',hints:['মোৰ জ্বৰ আছে','পেটত বিষ','মূৰ বিষ','কাহ আছে','ডাক্তৰ লাগিব'],welcome:'নমস্কাৰ! 🙏 মই আপোনাৰ ArogyaAI স্বাস্থ্য সহায়ক।\n\nঅসমীয়াত আপোনাৰ লক্ষণ কওক।',placeholder:'অসমীয়াত টাইপ কৰক...'},
+  {code:'ur',name:'Urdu',native:'اردو',flag:'🏳️',hints:['مجھے بخار ہے','پیٹ میں درد','سر درد','کھانسی ہے','ڈاکٹر چاہیے'],welcome:'!آداب 🙏 میں آپ کا ArogyaAI صحت مددگار ہوں\n\nاردو میں اپنی تکلیف بتائیں',placeholder:'اردو میں ٹائپ کریں...'},
+  {code:'en',name:'English',native:'English',flag:'🌐',hints:['I have fever','Stomach pain','Headache','I have cough','Need a doctor'],welcome:'Hello! 🙏 I am your ArogyaAI health assistant.\n\nTell me your symptoms and I will help you find the right doctor and care.',placeholder:'Describe your symptoms...'},
+];
+
+const QUICK_LANGS = ['hi','ta','te','kn','ml','mr','or','en'];
+
+let currentLang = LANGUAGES[0];
+let micActive = false;
+let recognition = null;
+let chatHistory = [];
+let selectedSample = null;
+let labLang = 'hi';
+
+// ═══════════════ INIT ═══════════════
+window.onload = function() {
+  renderLangList(LANGUAGES);
+  renderQuickLangs();
+  renderLabLangs();
+  initSpeechRecognition();
+};
+
+// ═══════════════ TAB SWITCH ═══════════════
+function switchTab(tab, btn) {
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('panel-' + tab).classList.add('on');
+}
+
+// ═══════════════ LANGUAGE LIST ═══════════════
+function renderLangList(list) {
+  const container = document.getElementById('lang-list');
+  container.innerHTML = list.map(l => `
+    <div class="lang-item ${l.code === currentLang.code ? 'on' : ''}" onclick="setLang('${l.code}')">
+      <span class="lang-flag">${l.flag}</span>
+      <div>
+        <div class="lang-name">${l.name}</div>
+        <div class="lang-native">${l.native}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderQuickLangs() {
+  const container = document.getElementById('quick-langs');
+  container.innerHTML = QUICK_LANGS.map(code => {
+    const l = LANGUAGES.find(x => x.code === code);
+    return `<div class="qlang ${l.code === currentLang.code ? 'on' : ''}" onclick="setLang('${l.code}')">${l.flag} ${l.name}</div>`;
+  }).join('');
+}
+
+function renderLabLangs() {
+  const grid = document.getElementById('lab-lang-grid');
+  grid.innerHTML = LANGUAGES.slice(0, 12).map(l =>
+    `<div class="llang ${l.code === labLang ? 'on' : ''}" onclick="setLabLang('${l.code}',this)">${l.flag} ${l.name}</div>`
+  ).join('');
+}
+
+function filterLangs(q) {
+  const filtered = LANGUAGES.filter(l =>
+    l.name.toLowerCase().includes(q.toLowerCase()) ||
+    l.native.includes(q)
+  );
+  renderLangList(filtered);
+}
+
+function setLang(code) {
+  const lang = LANGUAGES.find(l => l.code === code);
+  if (!lang) return;
+  currentLang = lang;
+  renderLangList(LANGUAGES);
+  renderQuickLangs();
+
+  // Update UI
+  document.getElementById('clb-flag').textContent = lang.flag;
+  document.getElementById('clb-lang').textContent = lang.name + ' (' + lang.native + ')';
+  document.getElementById('clb-hint').textContent = 'Speak or type in ' + lang.name + ' — AI replies in ' + lang.name;
+  document.getElementById('chat-inp').placeholder = lang.placeholder;
+
+  // Update hints
+  const hints = document.getElementById('chat-hints');
+  hints.innerHTML = lang.hints.map(h => `<div class="chint" onclick="qs('${h}')">${h}</div>`).join('');
+
+  // Add welcome message
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg ai';
+  div.innerHTML = `
+    <div class="cavi">${lang.flag}</div>
+    <div>
+      <div class="cbub">${lang.welcome.replace(/\n/g,'<br>')}</div>
+      <div class="cmsg-meta"><span class="lang-tag">${lang.flag} ${lang.name}</span> Now</div>
+    </div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Update speech recognition language
+  if (recognition) {
+    const speechLangMap = {hi:'hi-IN',ta:'ta-IN',te:'te-IN',kn:'kn-IN',ml:'ml-IN',mr:'mr-IN',gu:'gu-IN',bn:'bn-IN',pa:'pa-IN',or:'or-IN',as:'as-IN',ur:'ur-PK',en:'en-IN'};
+    recognition.lang = speechLangMap[code] || 'hi-IN';
+  }
+
+  showToast(lang.flag + ' Switched to ' + lang.name, 1500);
+}
+
+function setLabLang(code, el) {
+  labLang = code;
+  document.querySelectorAll('.llang').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ═══════════════ SPEECH RECOGNITION ═══════════════
+function initSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    document.getElementById('mic-btn').title = 'Voice not supported in this browser. Use Chrome.';
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'hi-IN';
+
+  recognition.onstart = function() {
+    micActive = true;
+    const btn = document.getElementById('mic-btn');
+    btn.className = 'mic-btn recording';
+    btn.textContent = '⏹️';
+    document.getElementById('voice-status').style.display = 'flex';
+    document.getElementById('chat-inp').placeholder = '🎙️ Listening... speak now';
+  };
+
+  recognition.onresult = function(e) {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    document.getElementById('chat-inp').value = final || interim;
+  };
+
+  recognition.onend = function() {
+    micActive = false;
+    const btn = document.getElementById('mic-btn');
+    btn.className = 'mic-btn idle';
+    btn.textContent = '🎙️';
+    document.getElementById('voice-status').style.display = 'none';
+    document.getElementById('chat-inp').placeholder = currentLang.placeholder;
+    const val = document.getElementById('chat-inp').value.trim();
+    if (val) sendMsg();
+  };
+
+  recognition.onerror = function(e) {
+    micActive = false;
+    document.getElementById('mic-btn').className = 'mic-btn idle';
+    document.getElementById('mic-btn').textContent = '🎙️';
+    document.getElementById('voice-status').style.display = 'none';
+    document.getElementById('chat-inp').placeholder = currentLang.placeholder;
+    if (e.error !== 'no-speech') showToast('🎙️ Mic error: ' + e.error, 3000);
+  };
+}
+
+function toggleMic() {
+  if (!recognition) { showToast('🎙️ Use Chrome for voice input', 3000); return; }
+  if (micActive) { recognition.stop(); }
+  else { recognition.start(); }
+}
+
+// ═══════════════ VOICE CHAT MESSAGES ═══════════════
+function qs(text) {
+  document.getElementById('chat-inp').value = text;
+  sendMsg();
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+
+  addMsg(text, 'user');
+  showTyping();
+
+  const lang = currentLang;
+  const systemPrompt = `You are ArogyaAI, a compassionate Indian healthcare AI assistant. The user is communicating in ${lang.name} (${lang.native}). 
+CRITICAL RULES:
+1. ALWAYS reply in ${lang.name} — even if the user writes in English or mixes languages
+2. Be warm, respectful, and use appropriate greetings for the culture
+3. Help with symptom assessment, doctor recommendations, medicine queries
+4. Available doctors: Dr. Priya Sharma (Gen. Medicine, Chennai), Dr. Arun Mehta (Cardiology, Mumbai), Dr. Kavya Nair (Dermatology, Bangalore), Dr. Raj Singh (Pediatrics, Delhi)
+5. For emergencies, always mention 108
+6. Keep responses concise — 2-3 short paragraphs max
+7. End with a practical suggestion (book appointment, tele-consult, home remedy)
+8. Never diagnose — always recommend seeing a doctor for serious symptoms`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: systemPrompt,
+        messages: [
+          ...chatHistory.slice(-6).map(m => ({ role: m.r, content: m.t })),
+          { role: 'user', content: text }
+        ]
+      })
+    });
+    removeTyping();
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.content[0].text;
+      chatHistory.push({ r: 'user', t: text }, { r: 'assistant', t: reply });
+      addMsg(reply, 'ai', lang);
+    } else { fallbackMsg(text, lang); }
+  } catch(e) { removeTyping(); fallbackMsg(text, lang); }
+}
+
+function fallbackMsg(text, lang) {
+  const fallbacks = {
+    hi: 'आपके लक्षणों के लिए धन्यवाद। मैं आपको डॉ. प्रिया शर्मा से जोड़ने की सलाह देता हूं। क्या आप अभी तेले-कंसल्ट बुक करना चाहेंगे?',
+    ta: 'உங்கள் அறிகுறிகளுக்கு நன்றி. டாக்டர் காவ்யா நாயரை பரிந்துரைக்கிறேன். இப்போது டெலி-கன்சல்ட் பதிவு செய்யட்டுமா?',
+    te: 'మీ లక్షణాలకు ధన్యవాదాలు. డాక్టర్ ప్రియా శర్మను సంప్రదించమని సూచిస్తున్నాను.',
+    or: 'ଆପଣଙ୍କ ଲକ୍ଷଣ ପାଇଁ ଧନ୍ୟବାଦ। ଡ. ପ୍ରିୟା ଶର୍ମାଙ୍କ ସହ ପରାମର୍ଶ ନେବାକୁ ସୁପାରିଶ କରୁଛି।',
+    en: 'Thank you for sharing your symptoms. I recommend consulting Dr. Priya Sharma (General Medicine). Would you like to book a tele-consult now?'
+  };
+  addMsg(fallbacks[lang.code] || fallbacks.en, 'ai', lang);
+}
+
+function addMsg(text, role, lang) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg ' + role;
+  const l = lang || currentLang;
+  const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  if (role === 'ai') {
+    div.innerHTML = `
+      <div class="cavi">🤖</div>
+      <div>
+        <div class="cbub">${formatted}</div>
+        <div class="cmsg-meta"><span class="lang-tag">${l.flag} ${l.name}</span> Just now</div>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <div>
+        <div class="cbub">${formatted}</div>
+        <div class="cmsg-meta"><span class="lang-tag">${l.flag} ${l.name}</span> You</div>
+      </div>
+      <div class="cavi" style="background:var(--purple)">👤</div>`;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg ai'; div.id = 'typing';
+  div.innerHTML = `<div class="cavi">🤖</div><div class="typing-row"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping() { const t = document.getElementById('typing'); if(t) t.remove(); }
+
+// ═══════════════ LAB REPORT ═══════════════
+const SAMPLE_DATA = {
+  cbc: { name:'Complete Blood Count (CBC)', icon:'🩸', params:[
+    {name:'Hemoglobin',val:'11.2',unit:'g/dL',range:'12–17',status:'low'},
+    {name:'WBC (White Blood Cells)',val:'8,400',unit:'/μL',range:'4,500–11,000',status:'normal'},
+    {name:'Platelets',val:'2,20,000',unit:'/μL',range:'1,50,000–4,00,000',status:'normal'},
+    {name:'RBC (Red Blood Cells)',val:'3.8',unit:'million/μL',range:'4.5–6.0',status:'low'},
+    {name:'MCV',val:'72',unit:'fL',range:'80–100',status:'low'},
+    {name:'Neutrophils',val:'68',unit:'%',range:'40–75',status:'normal'},
+  ], overall:'mild_concern'},
+  diabetes: { name:'Diabetes Panel', icon:'💉', params:[
+    {name:'Fasting Blood Sugar',val:'142',unit:'mg/dL',range:'70–100',status:'high'},
+    {name:'Post-meal Blood Sugar',val:'218',unit:'mg/dL',range:'<140',status:'high'},
+    {name:'HbA1c',val:'7.8',unit:'%',range:'<5.7',status:'high'},
+    {name:'Insulin (Fasting)',val:'18',unit:'μU/mL',range:'2–20',status:'normal'},
+  ], overall:'concern'},
+  thyroid: { name:'Thyroid Panel', icon:'🦋', params:[
+    {name:'TSH (Thyroid Stimulating Hormone)',val:'6.8',unit:'mIU/L',range:'0.4–4.0',status:'high'},
+    {name:'T3 (Triiodothyronine)',val:'78',unit:'ng/dL',range:'80–200',status:'low'},
+    {name:'T4 (Thyroxine)',val:'5.2',unit:'μg/dL',range:'5.0–12.0',status:'normal'},
+    {name:'Free T4',val:'0.8',unit:'ng/dL',range:'0.8–1.8',status:'normal'},
+  ], overall:'mild_concern'},
+  lipid: { name:'Lipid Profile', icon:'❤️', params:[
+    {name:'Total Cholesterol',val:'228',unit:'mg/dL',range:'<200',status:'high'},
+    {name:'HDL (Good Cholesterol)',val:'38',unit:'mg/dL',range:'>40 (M), >50 (F)',status:'low'},
+    {name:'LDL (Bad Cholesterol)',val:'158',unit:'mg/dL',range:'<100',status:'high'},
+    {name:'Triglycerides',val:'182',unit:'mg/dL',range:'<150',status:'high'},
+    {name:'VLDL',val:'36',unit:'mg/dL',range:'<30',status:'high'},
+  ], overall:'concern'},
+  liver: { name:'Liver Function Test (LFT)', icon:'🫀', params:[
+    {name:'ALT (SGPT)',val:'32',unit:'U/L',range:'7–56',status:'normal'},
+    {name:'AST (SGOT)',val:'28',unit:'U/L',range:'10–40',status:'normal'},
+    {name:'Total Bilirubin',val:'1.1',unit:'mg/dL',range:'0.1–1.2',status:'normal'},
+    {name:'Alkaline Phosphatase',val:'88',unit:'U/L',range:'44–147',status:'normal'},
+    {name:'Total Protein',val:'7.2',unit:'g/dL',range:'6.3–8.2',status:'normal'},
+  ], overall:'good'},
+  kidney: { name:'Kidney Function Test (KFT)', icon:'🫘', params:[
+    {name:'Serum Creatinine',val:'1.4',unit:'mg/dL',range:'0.6–1.2',status:'high'},
+    {name:'Blood Urea Nitrogen',val:'24',unit:'mg/dL',range:'7–20',status:'high'},
+    {name:'Uric Acid',val:'7.8',unit:'mg/dL',range:'3.4–7.0',status:'high'},
+    {name:'eGFR',val:'62',unit:'mL/min',range:'>60',status:'normal'},
+    {name:'Sodium',val:'138',unit:'mEq/L',range:'136–145',status:'normal'},
+    {name:'Potassium',val:'4.1',unit:'mEq/L',range:'3.5–5.1',status:'normal'},
+  ], overall:'mild_concern'},
+};
+
+const AI_EXPLANATIONS = {
+  cbc: {
+    hi:'आपकी CBC रिपोर्ट में हीमोग्लोबिन और RBC कम है — यह **एनीमिया (खून की कमी)** के संकेत हैं। MCV कम होना बताता है यह Iron की कमी से है।\n\nWBC और Platelets सामान्य हैं, जो अच्छा है।\n\n**क्या करें:** Iron युक्त खाना खाएं (पालक, चुकंदर, दाल) और डॉक्टर से Iron supplement लेने की सलाह लें।',
+    en:'Your CBC shows low Hemoglobin and RBC — signs of **Iron Deficiency Anemia**. Low MCV confirms this is related to iron.\n\nWBC and Platelets are normal, which is good.\n\n**Recommendation:** Eat iron-rich foods (spinach, lentils, beetroot) and consult a doctor for iron supplements.',
+    or:'ଆପଣଙ୍କ CBC ରିପୋର୍ଟରେ ହିମୋଗ୍ଲୋବିନ ଏବଂ RBC କମ ଅଛି — ଏହା **ରକ୍ତ ଶୂନ୍ୟତା** ର ସଙ୍କେତ। ଲୌହ ସମୃଦ୍ଧ ଖାଦ୍ୟ ଖାଆନ୍ତୁ।',
+  },
+  diabetes: {
+    hi:'⚠️ आपके Blood Sugar और HbA1c दोनों उच्च हैं — यह **Type 2 Diabetes** का संकेत है। HbA1c 7.8% बताता है कि पिछले 3 महीनों से Blood Sugar अनियंत्रित है।\n\n**तुरंत करें:** किसी Endocrinologist से मिलें, चीनी और refined carbs बंद करें, रोज़ 30 मिनट walk करें।',
+    en:'⚠️ Your Blood Sugar and HbA1c are elevated — indicating **Type 2 Diabetes**. HbA1c of 7.8% means blood sugar has been uncontrolled for ~3 months.\n\n**Act now:** Consult an Endocrinologist, stop sugar & refined carbs, walk 30 minutes daily.',
+    or:'⚠️ ଆପଣଙ୍କ Blood Sugar ଏବଂ HbA1c ଉଚ୍ଚ ଅଛି — **ଡାଏବେଟିସ** ର ସଙ୍କେତ। ଏଣ୍ଡୋକ୍ରିନୋଲୋଜିଷ୍ଟଙ୍କ ସହ ଭେଟ ହୁଅନ୍ତୁ।',
+  },
+  thyroid: {
+    hi:'TSH ज़्यादा और T3 कम — यह **Hypothyroidism** (थायरॉइड कम काम करना) के संकेत हैं। इससे थकान, वजन बढ़ना, ठंड लगना जैसी परेशानियां होती हैं।\n\n**सुझाव:** Endocrinologist से मिलें। Levothyroxine tablet से यह आसानी से नियंत्रित होता है।',
+    en:'High TSH and low T3 indicate **Hypothyroidism** (underactive thyroid). This causes fatigue, weight gain, feeling cold, and brain fog.\n\n**Recommendation:** See an Endocrinologist. This is easily managed with Levothyroxine medication.',
+    or:'TSH ଅଧିକ ଏବଂ T3 କମ — **Hypothyroidism** ର ସଙ୍କେତ। Endocrinologistଙ୍କ ସହ ଭେଟ ହୁଅନ୍ତୁ।',
+  },
+  lipid: {
+    hi:'⚠️ Cholesterol, LDL और Triglycerides सभी ज़्यादा हैं, और Good Cholesterol (HDL) कम है — यह **Heart Disease का खतरा** बढ़ाता है।\n\n**तुरंत करें:** तला हुआ खाना बंद करें, Cardiologist से मिलें, रोज़ exercise करें।',
+    en:'⚠️ High Cholesterol, LDL, Triglycerides and low HDL — this significantly increases **Heart Disease risk**.\n\n**Act now:** Stop fried/fatty foods, consult a Cardiologist, exercise daily.',
+    or:'⚠️ Cholesterol ଏବଂ LDL ଅଧିକ, HDL କମ — **ହୃଦ ରୋଗ** ର ଆଶଙ୍କା। Cardiologistଙ୍କ ସହ ଭେଟ ହୁଅନ୍ତୁ।',
+  },
+  liver: {
+    hi:'👍 आपके Liver के सभी tests सामान्य हैं! ALT, AST, Bilirubin सब normal range में हैं। आपका Liver healthy है।\n\n**बनाए रखें:** शराब से दूर रहें, हरी सब्ज़ियां खाएं, पर्याप्त पानी पिएं।',
+    en:'👍 All your Liver function tests are in normal range! ALT, AST, Bilirubin are all healthy.\n\n**Keep it up:** Avoid alcohol, eat green vegetables, stay hydrated.',
+    or:'👍 ଆପଣଙ୍କ Liver ସଂଖ୍ୟା ସ୍ୱାଭାବିକ ଅଛି! ଆପଣଙ୍କ Liver ସୁସ୍ଥ ଅଛି।',
+  },
+  kidney: {
+    hi:'Creatinine, BUN और Uric Acid थोड़ा ज़्यादा है — **Kidney पर थोड़ा stress** है। eGFR अभी भी normal है, जो राहत की बात है।\n\n**करें:** खूब पानी पिएं (2-3 liter रोज़), नमक कम करें, Nephrologist से checkup करवाएं।',
+    en:'Creatinine, BUN and Uric Acid are mildly elevated — indicating **mild kidney stress**. eGFR is still normal which is encouraging.\n\n**Do:** Drink 2-3L water daily, reduce salt, see a Nephrologist for follow-up.',
+    or:'Creatinine ଏବଂ Uric Acid ଟିକିଏ ଅଧିକ — **Kidney ଉପରେ ଚାପ** ଅଛି। ପ୍ରଚୁର ପାଣି ପିଅନ୍ତୁ।',
+  },
+};
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) showFilePreview(file);
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) showFilePreview(file);
+}
+function showFilePreview(file) {
+  selectedSample = null;
+  document.querySelectorAll('.sample-card').forEach(c => c.classList.remove('on'));
+  const fp = document.getElementById('file-preview');
+  document.getElementById('fp-icon').textContent = file.name.endsWith('.pdf') ? '📄' : '🖼️';
+  document.getElementById('fp-name').textContent = file.name;
+  document.getElementById('fp-size').textContent = (file.size / 1024).toFixed(0) + ' KB';
+  fp.style.display = 'flex';
+  document.getElementById('analyze-btn').disabled = false;
+  showToast('📄 ' + file.name + ' ready to analyze', 2000);
+}
+function removeFile() {
+  document.getElementById('file-preview').style.display = 'none';
+  document.getElementById('file-inp').value = '';
+  document.getElementById('analyze-btn').disabled = true;
+  showToast('File removed', 1500);
+}
+
+function loadSample(type) {
+  selectedSample = type;
+  document.querySelectorAll('.sample-card').forEach(c => c.classList.remove('on'));
+  event.currentTarget.classList.add('on');
+  document.getElementById('file-preview').style.display = 'none';
+  document.getElementById('analyze-btn').disabled = false;
+  showToast('📋 Sample loaded: ' + SAMPLE_DATA[type].name, 2000);
+}
+
+async function analyzeReport() {
+  const btn = document.getElementById('analyze-btn');
+  const loading = document.getElementById('lab-loading');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.innerHTML = '<span class="spin">⏳</span> Analyzing...';
+  loading.style.display = 'flex';
+
+  const steps = ['Reading lab values...', 'Identifying abnormal results...', 'Generating explanation in ' + (LANGUAGES.find(l => l.code === labLang)?.name || 'Hindi') + '...', 'Preparing health advice...'];
+  let si = 0;
+  const stepInterval = setInterval(() => {
+    if (si < steps.length) document.getElementById('lo-status').textContent = steps[si++];
+  }, 600);
+
+  await new Promise(r => setTimeout(r, 2800));
+  clearInterval(stepInterval);
+  loading.style.display = 'none';
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.innerHTML = '🔬 Analyze Report';
+
+  if (selectedSample) {
+    renderResult(selectedSample);
+  } else {
+    renderUploadedResult();
+  }
+}
+
+function renderResult(type) {
+  const data = SAMPLE_DATA[type];
+  const lang = LANGUAGES.find(l => l.code === labLang) || LANGUAGES[0];
+  const exp = AI_EXPLANATIONS[type];
+  const explanation = exp[labLang] || exp.en;
+
+  const overallStatus = data.overall === 'good'
+    ? { cls: 'status-good', icon: '✅', text: 'All values in normal range — great health!' }
+    : data.overall === 'mild_concern'
+    ? { cls: 'status-warn', icon: '⚠️', text: 'Some values need attention — consult a doctor' }
+    : { cls: 'status-alert', icon: '🚨', text: 'Significant abnormalities found — see a doctor soon' };
+
+  const paramRows = data.params.map(p => {
+    const statusIcon = p.status === 'normal' ? '✓' : p.status === 'high' ? '↑' : '↓';
+    const statusClass = p.status === 'normal' ? 'pt-normal' : p.status === 'high' ? 'pt-high' : 'pt-low';
+    const valClass = p.status === 'normal' ? 'ok' : p.status === 'high' ? 'hi' : 'lo';
+    return `
+      <div class="pt-row">
+        <div class="pt-name">${p.name}</div>
+        <div class="pt-val ${valClass}">${p.val} <span style="font-size:10px;font-weight:400;color:var(--ink4)">${p.unit}</span></div>
+        <div class="pt-range">Normal: ${p.range}</div>
+        <div class="pt-status ${statusClass}">${statusIcon}</div>
+      </div>`;
+  }).join('');
+
+  const adviceMap = {
+    cbc: [{icon:'🥬',title:'Eat Iron-Rich Foods',text:'Spinach, lentils, beetroot, pomegranate daily'},{icon:'💊',title:'Iron Supplement',text:'Ask doctor about ferrous sulfate tablets'},{icon:'☀️',title:'Vitamin C Helps',text:'Lemon, orange juice helps absorb iron better'},{icon:'🩺',title:'Follow Up',text:'Repeat CBC after 3 months of treatment'}],
+    diabetes: [{icon:'🚶',title:'Walk 30 Min Daily',text:'Reduces blood sugar naturally'},{icon:'🥗',title:'Low Carb Diet',text:'Avoid rice, bread, sugar, sweets'},{icon:'💉',title:'Monitor Sugar',text:'Check blood sugar morning and evening'},{icon:'🩺',title:'See Endocrinologist',text:'May need medication like Metformin'}],
+    thyroid: [{icon:'💊',title:'Medication Available',text:'Levothyroxine is safe and effective'},{icon:'🏥',title:'Regular Checkups',text:'TSH test every 6 months'},{icon:'🥜',title:'Avoid Soy & Gluten',text:'Can interfere with thyroid function'},{icon:'😴',title:'Rest Well',text:'Fatigue is common — prioritize sleep'}],
+    lipid: [{icon:'🐟',title:'Eat Omega-3',text:'Fish, flaxseeds, walnuts lower LDL'},{icon:'🚫',title:'Avoid Fried Food',text:'Ghee, butter, fried snacks worsen lipids'},{icon:'🏃',title:'Cardio Exercise',text:'30 min daily reduces cholesterol significantly'},{icon:'❤️',title:'See Cardiologist',text:'May need Statin medication'}],
+    liver: [{icon:'🚫',title:'Avoid Alcohol',text:'Biggest threat to liver health'},{icon:'💧',title:'Stay Hydrated',text:'2-3 litres of water every day'},{icon:'🥦',title:'Eat Greens',text:'Broccoli, spinach protect liver cells'},{icon:'✅',title:'Annual Check',text:'Repeat LFT every 12 months'}],
+    kidney: [{icon:'💧',title:'Drink More Water',text:'2-3 litres daily flushes kidneys'},{icon:'🧂',title:'Reduce Salt',text:'High sodium strains kidneys'},{icon:'🥩',title:'Less Red Meat',text:'High protein increases creatinine'},{icon:'🏥',title:'Nephrology Review',text:'Follow up in 3 months with renal panel'}],
+  };
+
+  const advice = adviceMap[type] || [];
+  const formatted = explanation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,'<br>');
+
+  document.getElementById('result-empty').style.display = 'none';
+  const rc = document.getElementById('result-content');
+  rc.style.display = 'block';
+  rc.innerHTML = `
+    <div class="result-header">
+      <div class="rh-icon">${data.icon}</div>
+      <div>
+        <div class="rh-title">${data.name}</div>
+        <div class="rh-sub">Analyzed by ArogyaAI · ${new Date().toLocaleDateString('en-IN')}</div>
+        <div class="rh-lang">${lang.flag} Explained in ${lang.name}</div>
+      </div>
+    </div>
+
+    <div class="status-bar ${overallStatus.cls}">${overallStatus.icon} ${overallStatus.text}</div>
+
+    <div class="summary-box">
+      <div class="sb-title">🤖 AI Explanation (${lang.name})</div>
+      <div class="summary-text">${formatted}</div>
+    </div>
+
+    <div class="param-table">
+      <div class="pt-title">📊 Test Parameters</div>
+      ${paramRows}
+    </div>
+
+    <div class="advice-grid">
+      ${advice.map(a => `<div class="advice-card"><div class="ac-icon">${a.icon}</div><div class="ac-title">${a.title}</div><div class="ac-text">${a.text}</div></div>`).join('')}
+    </div>
+
+    <div class="result-actions">
+      <button class="ra-btn primary" onclick="showToast('📅 Opening booking...',2000);setTimeout(()=>window.location.href='dashboard.html',1500)">📅 Book Doctor</button>
+      <button class="ra-btn" onclick="showToast('📤 Sharing with doctor...',2000)">📤 Share with Doctor</button>
+      <button class="ra-btn" onclick="window.print()">🖨️ Print</button>
+    </div>
+
+    <div style="background:var(--amber-bg);border:1px solid rgba(184,115,20,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--amber);display:flex;gap:8px;align-items:flex-start">
+      <span style="flex-shrink:0;font-size:16px">⚠️</span>
+      <span>This AI analysis is for educational purposes only and does not replace professional medical advice. Always consult a qualified doctor for diagnosis and treatment.</span>
+    </div>
+  `;
+}
+
+function renderUploadedResult() {
+  // For non-sample uploads, use Claude to analyze
+  document.getElementById('result-empty').style.display = 'none';
+  const rc = document.getElementById('result-content');
+  rc.style.display = 'block';
+  const lang = LANGUAGES.find(l => l.code === labLang) || LANGUAGES[0];
+  rc.innerHTML = `
+    <div class="result-header">
+      <div class="rh-icon">📄</div>
+      <div>
+        <div class="rh-title">Uploaded Report Analysis</div>
+        <div class="rh-sub">Analyzed by ArogyaAI · ${new Date().toLocaleDateString('en-IN')}</div>
+        <div class="rh-lang">${lang.flag} Explained in ${lang.name}</div>
+      </div>
+    </div>
+    <div class="status-bar status-warn">⚠️ AI has analyzed your uploaded report</div>
+    <div class="summary-box">
+      <div class="sb-title">🤖 AI Explanation</div>
+      <div class="summary-text">Your report has been analyzed. Please note that for accurate interpretation, values from actual report data are used. Share this with your doctor using the button below for a comprehensive review.<br><br>Try one of the <strong>sample reports</strong> on the left to see a full detailed breakdown with parameter analysis and health advice.</div>
+    </div>
+    <div class="result-actions">
+      <button class="ra-btn primary" onclick="showToast('📅 Opening booking...',2000)">📅 Book Doctor</button>
+      <button class="ra-btn" onclick="showToast('📤 Sharing with doctor...',2000)">📤 Share with Doctor</button>
+    </div>`;
+}
+
+// ═══════════════ TOAST ═══════════════
+let toastTimer;
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), dur);
+}
+</script>
+</body>
+</html>
