@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A7B5E">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ArogyaAI">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ArogyaAI — Voice & Lab Report AI</title>
@@ -999,5 +1008,16 @@ function showToast(msg, dur=3000) {
   toastTimer = setTimeout(() => t.classList.remove('show'), dur);
 }
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/arogyaai/sw.js')
+      .then(function(reg) { console.log('ArogyaAI SW ready'); })
+      .catch(function(e) { console.warn('SW not registered:', e); });
+  });
+}
+</script>
+
 </body>
 </html>
