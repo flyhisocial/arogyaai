@@ -170,6 +170,24 @@ const AROGYAAI = (() => {
     return true;
   }
 
+
+  // ── AI RESPONSE CACHE (saves repeated API calls) ──
+  const _aiCache = new Map();
+  function _cacheKey(msg, lang) { return (lang||'en') + '::' + msg.toLowerCase().trim().slice(0,120); }
+
+  async function aiChatCached(message, language = 'English', history = []) {
+    const key = _cacheKey(message, language);
+    if (_aiCache.has(key)) {
+      return { ok: true, data: { reply: _aiCache.get(key), cached: true } };
+    }
+    const r = await aiChat(message, language, history);
+    if (r.ok && r.data && r.data.reply) {
+      _aiCache.set(key, r.data.reply);
+      if (_aiCache.size > 50) _aiCache.delete(_aiCache.keys().next().value);
+    }
+    return r;
+  }
+
   return {
     // Config
     API_BASE,
@@ -186,7 +204,7 @@ const AROGYAAI = (() => {
     // Reports
     uploadReport, getMyReports, reviewReport,
     // AI
-    aiChat,
+    aiChat, aiChatCached,
     // Admin
     getAdminStats, getPendingDoctors, verifyDoctor,
     // Utils
