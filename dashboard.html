@@ -1,492 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0A7B5E">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ArogyaAI">
-  <link rel="apple-touch-icon" href="icon-192.svg">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ArogyaAI — India's Healthcare Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #F5F3EF;
-  --surface: #FFFFFF;
-  --surface2: #F0EDE8;
-  --border: #E2DDD6;
-  --border2: #D0CABC;
-  --text: #1A1714;
-  --text2: #6B6560;
-  --text3: #9E9890;
-  --teal: #0A7B5E;
-  --teal-light: #E0F2EB;
-  --teal-mid: #1D9E75;
-  --blue: #1A5CB8;
-  --blue-light: #E8F0FC;
-  --amber: #B05A00;
-  --amber-light: #FFF0DC;
-  --coral: #C03B2A;
-  --coral-light: #FDECEA;
-  --purple: #5B3FBE;
-  --purple-light: #EEE9FF;
-  --green: #2A7A3A;
-  --green-light: #E8F5EC;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
-h1, h2, h3, h4 { font-family: 'Sora', sans-serif; }
-button { cursor: pointer; font-family: 'DM Sans', sans-serif; }
-input, textarea, select { font-family: 'DM Sans', sans-serif; }
-
-/* ===== ROLE SELECTOR ===== */
-#role-selector {
-  position: fixed; inset: 0; background: linear-gradient(135deg, #0A7B5E 0%, #065C46 50%, #033D30 100%);
-  display: flex; align-items: center; justify-content: center; z-index: 1000;
-  animation: fadeIn 0.4s ease;
-}
-.role-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 48px; max-width: 600px; width: 90%; text-align: center; }
-.role-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
-.role-logo svg { width: 36px; height: 36px; }
-.role-logo span { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 700; color: #fff; }
-.role-tagline { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 36px; }
-.role-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-.role-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 20px 16px; color: #fff; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.role-btn:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); border-color: rgba(255,255,255,0.4); }
-.role-btn .icon { width: 44px; height: 44px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-.role-btn .label { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; }
-.role-btn .sub { font-size: 11px; color: rgba(255,255,255,0.5); }
-
-/* ===== APP SHELL ===== */
-#app { display: none; flex-direction: column; height: 100vh; }
-#app.active { display: flex; }
-
-/* ===== TOP NAV ===== */
-.topnav { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 16px; flex-shrink: 0; }
-.nav-logo { display: flex; align-items: center; gap: 8px; }
-.nav-logo svg { width: 24px; height: 24px; }
-.nav-logo span { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--teal); }
-.nav-role-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: var(--teal-light); color: var(--teal); }
-.nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-.nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 600; font-family: 'Sora', sans-serif; }
-.nav-switch { font-size: 12px; color: var(--text2); background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; transition: all 0.15s; }
-.nav-switch:hover { background: var(--border); }
-.nav-notif { position: relative; width: 32px; height: 32px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
-.nav-notif::after { content: '3'; position: absolute; top: -4px; right: -4px; background: var(--coral); color: #fff; font-size: 9px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
-
-/* ===== MAIN LAYOUT ===== */
-.main-layout { display: flex; flex: 1; overflow: hidden; }
-
-/* ===== SIDEBAR ===== */
-.sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
-.sidebar-section { padding: 16px 12px 8px; }
-.sidebar-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 0 8px; margin-bottom: 4px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text2); background: none; border: none; width: 100%; text-align: left; transition: all 0.15s; cursor: pointer; }
-.nav-item svg { width: 18px; height: 18px; opacity: 0.7; flex-shrink: 0; }
-.nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.active { background: var(--teal-light); color: var(--teal); }
-.nav-item.active svg { opacity: 1; }
-.nav-badge { margin-left: auto; font-size: 10px; font-weight: 600; background: var(--coral); color: #fff; padding: 2px 7px; border-radius: 20px; }
-.sidebar-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
-
-/* ===== CONTENT ===== */
-.content { flex: 1; overflow-y: auto; padding: 24px; }
-.page { display: none; animation: slideIn 0.25s ease; }
-.page.active { display: block; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ===== COMMON COMPONENTS ===== */
-.page-header { margin-bottom: 24px; }
-.page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.page-sub { font-size: 14px; color: var(--text2); }
-
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); }
-.stat-label { font-size: 11px; font-weight: 500; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
-.stat-value { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.stat-change { font-size: 12px; }
-.stat-up { color: var(--green); }
-.stat-down { color: var(--coral); }
-.stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
-.card-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-.card-link { font-size: 12px; color: var(--teal); font-weight: 500; background: none; border: none; cursor: pointer; }
-
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-.grid-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
-
-.badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-.badge-green { background: var(--green-light); color: var(--green); }
-.badge-blue { background: var(--blue-light); color: var(--blue); }
-.badge-amber { background: var(--amber-light); color: var(--amber); }
-.badge-coral { background: var(--coral-light); color: var(--coral); }
-.badge-teal { background: var(--teal-light); color: var(--teal); }
-.badge-purple { background: var(--purple-light); color: var(--purple); }
-
-/* Table */
-.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.data-table th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; padding: 0 12px 10px; border-bottom: 1px solid var(--border); }
-.data-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--surface2); }
-
-/* Avatar */
-.avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: 'Sora', sans-serif; flex-shrink: 0; }
-
-/* Btn */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; border: none; transition: all 0.15s; }
-.btn-primary { background: var(--teal); color: #fff; }
-.btn-primary:hover { background: #096A50; }
-.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { background: var(--border); }
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-
-/* Input */
-.form-group { margin-bottom: 14px; }
-.form-label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
-.form-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--surface); color: var(--text); outline: none; transition: border 0.15s; }
-.form-input:focus { border-color: var(--teal-mid); }
-.form-textarea { resize: vertical; min-height: 80px; }
-select.form-input { appearance: none; }
-
-/* ===== AI CHAT ===== */
-.chat-container { display: flex; flex-direction: column; height: calc(100vh - 110px); }
-.chat-messages { flex: 1; overflow-y: auto; padding: 16px 0; display: flex; flex-direction: column; gap: 16px; }
-.chat-msg { display: flex; gap: 12px; max-width: 75%; }
-.chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
-.chat-bubble { padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
-.chat-msg.ai .chat-bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 4px 16px 16px 16px; }
-.chat-msg.user .chat-bubble { background: var(--teal); color: #fff; border-radius: 16px 4px 16px 16px; }
-.chat-ai-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--teal); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.chat-typing { display: flex; gap: 4px; align-items: center; padding: 12px 16px; }
-.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: typing 1.2s infinite; }
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
-.chat-input-area { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; display: flex; gap: 10px; align-items: flex-end; }
-.chat-input { flex: 1; border: none; outline: none; font-size: 14px; background: transparent; resize: none; max-height: 100px; font-family: 'DM Sans', sans-serif; color: var(--text); }
-.chat-actions { display: flex; gap: 8px; align-items: center; }
-.upload-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); transition: all 0.15s; }
-.upload-btn:hover { background: var(--teal-light); color: var(--teal); border-color: var(--teal-mid); }
-.send-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--teal); border: none; display: flex; align-items: center; justify-content: center; color: #fff; transition: all 0.15s; }
-.send-btn:hover { background: #096A50; }
-
-/* Upload zones */
-.upload-zone { border: 2px dashed var(--border2); border-radius: 12px; padding: 28px; text-align: center; transition: all 0.2s; cursor: pointer; }
-.upload-zone:hover, .upload-zone.drag { border-color: var(--teal-mid); background: var(--teal-light); }
-.upload-zone p { font-size: 13px; color: var(--text2); margin-top: 8px; }
-.file-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-.file-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); font-size: 13px; }
-.file-item-icon { font-size: 20px; }
-.file-item-name { flex: 1; color: var(--text); font-weight: 500; }
-.file-item-size { color: var(--text3); font-size: 11px; }
-.file-item-badge { }
-
-/* Modal */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; display: none; align-items: center; justify-content: center; }
-.modal-overlay.open { display: flex; }
-.modal { background: var(--surface); border-radius: 20px; padding: 28px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: slideIn 0.2s ease; }
-.modal-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
-.modal-close { position: absolute; top: 16px; right: 16px; background: var(--surface2); border: none; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); cursor: pointer; }
-.modal { position: relative; }
-
-/* Chart bar */
-.mini-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
-.mini-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
-
-/* Prescription card */
-.rx-card { background: linear-gradient(135deg, #F0FAF5 0%, #E6F7EF 100%); border: 1px solid #B8E8D0; border-radius: 14px; padding: 20px; }
-.rx-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px dashed #B8E8D0; }
-.rx-badge { background: var(--teal); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; }
-.rx-drug { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; }
-.rx-drug:last-child { border-bottom: none; }
-.rx-drug-name { font-weight: 500; }
-.rx-drug-dose { color: var(--text2); font-size: 12px; }
-
-/* Timeline */
-.timeline { display: flex; flex-direction: column; gap: 0; }
-.timeline-item { display: flex; gap: 14px; padding-bottom: 16px; position: relative; }
-.timeline-item::before { content: ''; position: absolute; left: 15px; top: 32px; width: 1px; height: calc(100% - 16px); background: var(--border); }
-.timeline-item:last-child::before { display: none; }
-.timeline-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; border: 2px solid var(--surface); }
-.timeline-content { flex: 1; padding-top: 4px; }
-.timeline-title { font-size: 13px; font-weight: 500; color: var(--text); }
-.timeline-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
-
-/* Progress ring */
-.progress-wrap { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; }
-
-/* Tabs */
-.tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
-.tab-btn { flex: 1; padding: 8px; border: none; border-radius: 7px; background: transparent; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; }
-.tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-
-/* Health metric */
-.health-metric { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.health-metric:last-child { border-bottom: none; }
-.metric-name { font-size: 13px; color: var(--text2); }
-.metric-val { font-size: 14px; font-weight: 600; color: var(--text); font-family: 'Sora', sans-serif; }
-.metric-status { }
-
-/* Admin chart */
-.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
-.chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.chart-bar-col { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s ease; cursor: pointer; }
-.chart-bar-col:hover { opacity: 0.8; }
-.chart-bar-label { font-size: 10px; color: var(--text3); }
-
-/* Doctor quick action */
-.quick-action { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; transition: all 0.15s; font-size: 13px; font-weight: 500; }
-.quick-action:hover { background: var(--teal-light); border-color: var(--teal-mid); color: var(--teal); }
-.quick-action-icon { font-size: 18px; }
-
-/* Video call UI */
-.video-card { background: #1A1714; border-radius: 16px; overflow: hidden; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative; }
-.video-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 28px; font-family: 'Sora', sans-serif; font-weight: 700; color: #fff; }
-.video-label { position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 6px; }
-.video-controls { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
-.video-ctrl { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: none; cursor: pointer; transition: all 0.15s; }
-.video-ctrl-red { background: var(--coral-light); color: var(--coral); }
-.video-ctrl-red:hover { background: var(--coral); color: #fff; }
-.video-ctrl-default { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
-.video-ctrl-default:hover { background: var(--border); }
-.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
-</style>
-
-<script src="api.js"></script>
-</head>
-<body>
-
-<!-- ROLE SELECTOR -->
-<div id="role-selector">
-  <div class="role-card">
-    <div class="role-logo">
-      <svg viewBox="0 0 36 36" fill="none"><rect width="36" height="36" rx="10" fill="rgba(255,255,255,0.2)"/><path d="M18 8v8M14 12h8M11 20c0 3.866 3.134 7 7 7s7-3.134 7-7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="18" cy="20" r="3" fill="#fff"/></svg>
-      <span>ArogyaAI</span>
-    </div>
-    <p class="role-tagline">India's AI-powered healthcare platform</p>
-    <div class="role-options">
-      <button class="role-btn" onclick="switchRole('admin')">
-        <div class="icon">🏥</div>
-        <div class="label">Admin</div>
-        <div class="sub">Platform overview</div>
-      </button>
-      <button class="role-btn" onclick="switchRole('doctor')">
-        <div class="icon">👨‍⚕️</div>
-        <div class="label">Doctor</div>
-        <div class="sub">Manage patients</div>
-      </button>
-      <button class="role-btn" onclick="switchRole('patient')">
-        <div class="icon">🧑‍💼</div>
-        <div class="label">Patient</div>
-        <div class="sub">My health portal</div>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- APP SHELL -->
-<div id="app">
-  <!-- TOP NAV -->
-  <nav class="topnav">
-    <div class="nav-logo">
-      <svg viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="7" fill="#0A7B5E"/><path d="M12 5v6M9 8h6M7 14c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="14" r="2" fill="#fff"/></svg>
-      <span>ArogyaAI</span>
-    </div>
-    <span class="nav-role-badge" id="role-badge">Admin</span>
-    <div class="nav-right">
-      <div class="nav-notif">🔔</div>
-      <button class="nav-switch" onclick="showRoleSelector()">Switch Role</button><button class="nav-switch" onclick="handleLogout()" style="color:var(--coral)">Sign Out</button>
-      <div class="nav-avatar" id="nav-avatar">A</div>
-    </div>
-  </nav>
-
-  <div class="main-layout">
-    <!-- SIDEBAR -->
-    <nav class="sidebar" id="sidebar"></nav>
-
-    <!-- CONTENT -->
-    <main class="content" id="content"></main>
-  </div>
-</div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal" id="modal-content"></div>
-</div>
-
-<script>
-// ===== STATE =====
-let currentRole = 'patient';
-let currentPage = '';
-let chatHistory = [];
-let uploadedFiles = [];
-
+<!doctype html><html lang=en><head><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://api.anthropic.com"><link href=manifest.json rel=manifest><meta content=#0A7B5E name=theme-color><meta content=yes name=mobile-web-app-capable><meta content=yes name=apple-mobile-web-app-capable><meta content=default name=apple-mobile-web-app-status-bar-style><meta content=ArogyaAI name=apple-mobile-web-app-title><link href=icon-192.svg rel=apple-touch-icon><meta charset=UTF-8><meta content="width=device-width,initial-scale=1.0" name=viewport><title>ArogyaAI — India's Healthcare Platform</title><link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel=stylesheet><style>:root{--bg:#f5f3ef;--surface:#fff;--surface2:#f0ede8;--border:#e2ddd6;--border2:#d0cabc;--text:#1a1714;--text2:#6b6560;--text3:#9e9890;--teal:#0a7b5e;--teal-light:#e0f2eb;--teal-mid:#1d9e75;--blue:#1a5cb8;--blue-light:#e8f0fc;--amber:#b05a00;--amber-light:#fff0dc;--coral:#c03b2a;--coral-light:#fdecea;--purple:#5b3fbe;--purple-light:#eee9ff;--green:#2a7a3a;--green-light:#e8f5ec;--shadow:0 1px 3px #0000000f,0 4px 12px #0000000a;--shadow-lg:0 4px 16px #00000014,0 1px 4px #0000000a}*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);height:100%;color:var(--text);font-family:DM Sans,sans-serif;overflow:hidden}h1,h2,h3,h4{font-family:Sora,sans-serif}button{cursor:pointer;font-family:DM Sans,sans-serif}input,textarea,select{font-family:DM Sans,sans-serif}#role-selector{z-index:1000;background:linear-gradient(135deg,#0a7b5e 0%,#065c46 50%,#033d30 100%);justify-content:center;align-items:center;animation:.4s fadeIn;display:flex;position:fixed;inset:0}.role-card{backdrop-filter:blur(20px);text-align:center;background:#ffffff0f;border:1px solid #ffffff26;border-radius:24px;width:90%;max-width:600px;padding:48px}.role-logo{justify-content:center;align-items:center;gap:10px;margin-bottom:8px;display:flex}.role-logo svg{width:36px;height:36px}.role-logo span{color:#fff;font-family:Sora,sans-serif;font-size:28px;font-weight:700}.role-tagline{color:#fff9;margin-bottom:36px;font-size:14px}.role-options{grid-template-columns:1fr 1fr 1fr;gap:12px;display:grid}.role-btn{color:#fff;background:#ffffff14;border:1px solid #fff3;border-radius:16px;flex-direction:column;align-items:center;gap:10px;padding:20px 16px;transition:all .2s;display:flex}.role-btn:hover{background:#ffffff29;border-color:#fff6;transform:translateY(-2px)}.role-btn .icon{background:#ffffff26;border-radius:12px;justify-content:center;align-items:center;width:44px;height:44px;font-size:22px;display:flex}.role-btn .label{font-family:Sora,sans-serif;font-size:14px;font-weight:600}.role-btn .sub{color:#ffffff80;font-size:11px}#app{flex-direction:column;height:100vh;display:none}#app.active{display:flex}.topnav{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center;gap:16px;height:56px;padding:0 20px;display:flex}.nav-logo{align-items:center;gap:8px;display:flex}.nav-logo svg{width:24px;height:24px}.nav-logo span{color:var(--teal);font-family:Sora,sans-serif;font-size:16px;font-weight:700}.nav-role-badge{background:var(--teal-light);color:var(--teal);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}.nav-right{align-items:center;gap:12px;margin-left:auto;display:flex}.nav-avatar{background:var(--teal);color:#fff;border-radius:50%;justify-content:center;align-items:center;width:32px;height:32px;font-family:Sora,sans-serif;font-size:12px;font-weight:600;display:flex}.nav-switch{color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;transition:all .15s}.nav-switch:hover{background:var(--border)}.nav-notif{background:var(--surface2);border:1px solid var(--border);border-radius:8px;justify-content:center;align-items:center;width:32px;height:32px;display:flex;position:relative}.nav-notif:after{content:"3";background:var(--coral);color:#fff;border-radius:50%;justify-content:center;align-items:center;width:16px;height:16px;font-size:9px;font-weight:600;display:flex;position:absolute;top:-4px;right:-4px}.main-layout{flex:1;display:flex;overflow:hidden}.sidebar{background:var(--surface);border-right:1px solid var(--border);flex-direction:column;flex-shrink:0;width:220px;display:flex;overflow-y:auto}.sidebar-section{padding:16px 12px 8px}.sidebar-section-label{letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;padding:0 8px;font-size:10px;font-weight:600}.nav-item{color:var(--text2);text-align:left;cursor:pointer;background:0 0;border:none;border-radius:10px;align-items:center;gap:10px;width:100%;padding:9px 12px;font-size:13px;font-weight:500;transition:all .15s;display:flex}.nav-item svg{opacity:.7;flex-shrink:0;width:18px;height:18px}.nav-item:hover{background:var(--surface2);color:var(--text)}.nav-item.active{background:var(--teal-light);color:var(--teal)}.nav-item.active svg{opacity:1}.nav-badge{background:var(--coral);color:#fff;border-radius:20px;margin-left:auto;padding:2px 7px;font-size:10px;font-weight:600}.sidebar-bottom{border-top:1px solid var(--border);margin-top:auto;padding:12px}.content{flex:1;padding:24px;overflow-y:auto}.page{animation:.25s slideIn;display:none}.page.active{display:block}@keyframes slideIn{0%{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes fadeIn{0%{opacity:0}to{opacity:1}}.page-header{margin-bottom:24px}.page-title{color:var(--text);margin-bottom:4px;font-size:22px;font-weight:700}.page-sub{color:var(--text2);font-size:14px}.stats-grid{grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;display:grid}.stat-card{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:14px;padding:18px}.stat-label{color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;font-size:11px;font-weight:500}.stat-value{color:var(--text);margin-bottom:4px;font-family:Sora,sans-serif;font-size:26px;font-weight:700}.stat-change{font-size:12px}.stat-up{color:var(--green)}.stat-down{color:var(--coral)}.stat-icon{border-radius:10px;justify-content:center;align-items:center;width:36px;height:36px;margin-bottom:12px;display:flex}.card{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:14px;padding:20px}.card-title{color:var(--text);justify-content:space-between;align-items:center;margin-bottom:16px;font-family:Sora,sans-serif;font-size:14px;font-weight:600;display:flex}.card-link{color:var(--teal);cursor:pointer;background:0 0;border:none;font-size:12px;font-weight:500}.grid-2{grid-template-columns:1fr 1fr;gap:16px;display:grid}.grid-3{grid-template-columns:1fr 1fr 1fr;gap:16px;display:grid}.grid-cols{grid-template-columns:2fr 1fr;gap:16px;display:grid}.badge{border-radius:20px;align-items:center;padding:3px 9px;font-size:11px;font-weight:600;display:inline-flex}.badge-green{background:var(--green-light);color:var(--green)}.badge-blue{background:var(--blue-light);color:var(--blue)}.badge-amber{background:var(--amber-light);color:var(--amber)}.badge-coral{background:var(--coral-light);color:var(--coral)}.badge-teal{background:var(--teal-light);color:var(--teal)}.badge-purple{background:var(--purple-light);color:var(--purple)}.data-table{border-collapse:collapse;width:100%;font-size:13px}.data-table th{text-align:left;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);padding:0 12px 10px;font-size:11px;font-weight:600}.data-table td{border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;padding:12px}.data-table tr:last-child td{border-bottom:none}.data-table tr:hover td{background:var(--surface2)}.avatar{border-radius:50%;flex-shrink:0;justify-content:center;align-items:center;width:34px;height:34px;font-family:Sora,sans-serif;font-size:12px;font-weight:700;display:flex}.btn{border:none;border-radius:10px;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex}.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:#096a50}.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:var(--border)}.btn-sm{padding:6px 12px;font-size:12px}.form-group{margin-bottom:14px}.form-label{color:var(--text2);margin-bottom:6px;font-size:12px;font-weight:500;display:block}.form-input{border:1px solid var(--border);background:var(--surface);width:100%;color:var(--text);border-radius:8px;outline:none;padding:9px 12px;font-size:13px;transition:border .15s}.form-input:focus{border-color:var(--teal-mid)}.form-textarea{resize:vertical;min-height:80px}select.form-input{appearance:none}.chat-container{flex-direction:column;height:calc(100vh - 110px);display:flex}.chat-messages{flex-direction:column;flex:1;gap:16px;padding:16px 0;display:flex;overflow-y:auto}.chat-msg{gap:12px;max-width:75%;display:flex}.chat-msg.user{flex-direction:row-reverse;align-self:flex-end}.chat-bubble{border-radius:16px;padding:12px 16px;font-size:14px;line-height:1.6}.chat-msg.ai .chat-bubble{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:4px 16px 16px}.chat-msg.user .chat-bubble{background:var(--teal);color:#fff;border-radius:16px 4px 16px 16px}.chat-ai-icon{background:var(--teal);border-radius:10px;flex-shrink:0;justify-content:center;align-items:center;width:36px;height:36px;display:flex}.chat-typing{align-items:center;gap:4px;padding:12px 16px;display:flex}.typing-dot{background:var(--text3);border-radius:50%;width:6px;height:6px;animation:1.2s infinite typing}.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}@keyframes typing{0%,60%,to{opacity:.4;transform:translateY(0)}30%{opacity:1;transform:translateY(-6px)}}.chat-input-area{background:var(--surface);border:1px solid var(--border);border-radius:14px;align-items:flex-end;gap:10px;padding:12px;display:flex}.chat-input{resize:none;max-height:100px;color:var(--text);background:0 0;border:none;outline:none;flex:1;font-family:DM Sans,sans-serif;font-size:14px}.chat-actions{align-items:center;gap:8px;display:flex}.upload-btn{background:var(--surface2);border:1px solid var(--border);width:36px;height:36px;color:var(--text2);border-radius:8px;justify-content:center;align-items:center;font-size:16px;transition:all .15s;display:flex}.upload-btn:hover{background:var(--teal-light);color:var(--teal);border-color:var(--teal-mid)}.send-btn{background:var(--teal);color:#fff;border:none;border-radius:8px;justify-content:center;align-items:center;width:36px;height:36px;transition:all .15s;display:flex}.send-btn:hover{background:#096a50}.upload-zone{border:2px dashed var(--border2);text-align:center;cursor:pointer;border-radius:12px;padding:28px;transition:all .2s}.upload-zone:hover,.upload-zone.drag{border-color:var(--teal-mid);background:var(--teal-light)}.upload-zone p{color:var(--text2);margin-top:8px;font-size:13px}.file-list{flex-direction:column;gap:8px;margin-top:12px;display:flex}.file-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;align-items:center;gap:10px;padding:10px 12px;font-size:13px;display:flex}.file-item-icon{font-size:20px}.file-item-name{color:var(--text);flex:1;font-weight:500}.file-item-size{color:var(--text3);font-size:11px}.modal-overlay{z-index:500;background:#0006;justify-content:center;align-items:center;display:none;position:fixed;inset:0}.modal-overlay.open{display:flex}.modal{background:var(--surface);width:520px;max-width:95vw;max-height:90vh;box-shadow:var(--shadow-lg);border-radius:20px;padding:28px;animation:.2s slideIn;overflow-y:auto}.modal-title{margin-bottom:4px;font-family:Sora,sans-serif;font-size:18px;font-weight:700}.modal-sub{color:var(--text2);margin-bottom:20px;font-size:13px}.modal-close{background:var(--surface2);width:30px;height:30px;color:var(--text2);cursor:pointer;border:none;border-radius:8px;justify-content:center;align-items:center;font-size:16px;display:flex;position:absolute;top:16px;right:16px}.modal{position:relative}.mini-bar{background:var(--border);border-radius:3px;height:6px;overflow:hidden}.mini-bar-fill{border-radius:3px;height:100%;transition:width .6s}.rx-card{background:linear-gradient(135deg,#f0faf5 0%,#e6f7ef 100%);border:1px solid #b8e8d0;border-radius:14px;padding:20px}.rx-header{border-bottom:1px dashed #b8e8d0;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;display:flex}.rx-badge{background:var(--teal);color:#fff;letter-spacing:.05em;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700}.rx-drug{border-bottom:1px solid #0000000d;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;display:flex}.rx-drug:last-child{border-bottom:none}.rx-drug-name{font-weight:500}.rx-drug-dose{color:var(--text2);font-size:12px}.timeline{flex-direction:column;gap:0;display:flex}.timeline-item{gap:14px;padding-bottom:16px;display:flex;position:relative}.timeline-item:before{content:"";background:var(--border);width:1px;height:calc(100% - 16px);position:absolute;top:32px;left:15px}.timeline-item:last-child:before{display:none}.timeline-dot{border:2px solid var(--surface);border-radius:50%;flex-shrink:0;justify-content:center;align-items:center;width:30px;height:30px;font-size:14px;display:flex}.timeline-content{flex:1;padding-top:4px}.timeline-title{color:var(--text);font-size:13px;font-weight:500}.timeline-time{color:var(--text3);margin-top:2px;font-size:11px}.progress-wrap{flex-direction:column;justify-content:center;align-items:center;gap:4px;display:flex}.tabs{background:var(--surface2);border-radius:10px;gap:4px;margin-bottom:20px;padding:4px;display:flex}.tab-btn{color:var(--text2);cursor:pointer;background:0 0;border:none;border-radius:7px;flex:1;padding:8px;font-size:12px;font-weight:500;transition:all .15s}.tab-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px #00000014}.health-metric{border-bottom:1px solid var(--border);justify-content:space-between;align-items:center;padding:10px 0;display:flex}.health-metric:last-child{border-bottom:none}.metric-name{color:var(--text2);font-size:13px}.metric-val{color:var(--text);font-family:Sora,sans-serif;font-size:14px;font-weight:600}.chart-bars{align-items:flex-end;gap:6px;height:100px;display:flex}.chart-bar-wrap{flex-direction:column;flex:1;align-items:center;gap:4px;display:flex}.chart-bar-col{cursor:pointer;border-radius:4px 4px 0 0;width:100%;transition:height .5s}.chart-bar-col:hover{opacity:.8}.chart-bar-label{color:var(--text3);font-size:10px}.quick-action{border:1px solid var(--border);background:var(--surface2);cursor:pointer;border-radius:10px;align-items:center;gap:10px;padding:10px 12px;font-size:13px;font-weight:500;transition:all .15s;display:flex}.quick-action:hover{background:var(--teal-light);border-color:var(--teal-mid);color:var(--teal)}.quick-action-icon{font-size:18px}.video-card{aspect-ratio:16/9;background:#1a1714;border-radius:16px;justify-content:center;align-items:center;display:flex;position:relative;overflow:hidden}.video-avatar{background:var(--teal);color:#fff;border-radius:50%;justify-content:center;align-items:center;width:72px;height:72px;font-family:Sora,sans-serif;font-size:28px;font-weight:700;display:flex}.video-label{color:#fff;background:#0009;border-radius:6px;padding:4px 10px;font-size:12px;position:absolute;bottom:12px;left:12px}.video-controls{justify-content:center;gap:10px;margin-top:12px;display:flex}.video-ctrl{cursor:pointer;border:none;border-radius:50%;justify-content:center;align-items:center;width:44px;height:44px;font-size:18px;transition:all .15s;display:flex}.video-ctrl-red{background:var(--coral-light);color:var(--coral)}.video-ctrl-red:hover{background:var(--coral);color:#fff}.video-ctrl-default{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}.video-ctrl-default:hover{background:var(--border)}.live-dot{background:#22c55e;border-radius:50%;width:8px;height:8px;animation:1.5s infinite pulse}@keyframes pulse{0%,to{opacity:1;box-shadow:0 0 #22c55e66}50%{opacity:.8;box-shadow:0 0 0 6px #22c55e00}}</style><script src=api.js></script></head><body><div id=role-selector><div class=role-card><div class=role-logo><svg viewbox="0 0 36 36" fill=none><rect fill=rgba(255,255,255,0.2) height=36 rx=10 width=36 /><path d="M18 8v8M14 12h8M11 20c0 3.866 3.134 7 7 7s7-3.134 7-7" stroke=#fff stroke-linecap=round stroke-width=2.5 /><circle cx=18 cy=20 fill=#fff r=3 /></svg><span>ArogyaAI</span></div><p class=role-tagline>India's AI-powered healthcare platform</p><div class=role-options><button onclick="switchRole('admin')" class=role-btn><div class=icon>🏥</div> <div class=label>Admin</div> <div class=sub>Platform overview</div></button><button onclick="switchRole('doctor')" class=role-btn><div class=icon>👨‍⚕️</div> <div class=label>Doctor</div> <div class=sub>Manage patients</div></button><button onclick="switchRole('patient')" class=role-btn><div class=icon>🧑‍💼</div> <div class=label>Patient</div> <div class=sub>My health portal</div></button></div></div></div><div id=app><nav class=topnav><div class=nav-logo><svg viewbox="0 0 24 24" fill=none><rect fill=#0A7B5E height=24 rx=7 width=24 /><path d="M12 5v6M9 8h6M7 14c0 2.76 2.24 5 5 5s5-2.24 5-5" stroke=#fff stroke-linecap=round stroke-width=2 /><circle cx=12 cy=14 fill=#fff r=2 /></svg><span>ArogyaAI</span></div><span class=nav-role-badge id=role-badge>Admin</span><div class=nav-right><div class=nav-notif>🔔</div><button class=nav-switch onclick=showRoleSelector()>Switch Role</button><button class=nav-switch onclick=handleLogout() style=color:var(--coral)>Sign Out</button><div class=nav-avatar id=nav-avatar>A</div></div></nav><div class=main-layout><nav class=sidebar id=sidebar></nav><main class=content id=content></main></div></div><div class=modal-overlay id=modal-overlay onclick=closeModal(event)><div class=modal id=modal-content></div></div><script>// ===== STATE =====
+let currentRole=`patient`,currentPage=``,chatHistory=[],uploadedFiles=[];
 // ===== ROLE CONFIG =====
-const roles = {
-  admin: {
-    badge: 'Admin Dashboard',
-    avatar: 'A',
-    nav: [
-      { section: 'Overview', items: [
-        { id: 'admin-dashboard', label: 'Dashboard', icon: dashIcon() },
-        { id: 'admin-consultations', label: 'Consultations', icon: videoIcon(), badge: '12' },
-        { id: 'admin-revenue', label: 'Revenue', icon: chartIcon() },
-      ]},
-      { section: 'Management', items: [
-        { id: 'admin-doctors', label: 'Doctors', icon: doctorIcon() },
-        { id: 'admin-patients', label: 'Patients', icon: usersIcon() },
-        { id: 'admin-reports', label: 'Reports & Labs', icon: fileIcon() },
-      ]},
-      { section: 'System', items: [
-        { id: 'admin-settings', label: 'Settings', icon: settingsIcon() },
-      { id: 'admin-cash', label: 'Cash & Commission', icon: chartIcon(), badge: '3' },
-      ]},
-    ]
-  },
-  doctor: {
-    badge: 'Doctor Portal',
-    avatar: 'Dr',
-    nav: [
-      { section: 'My Practice', items: [
-        { id: 'doctor-dashboard', label: 'Dashboard', icon: dashIcon() },
-        { id: 'doctor-appointments', label: 'Appointments', icon: calIcon(), badge: '5' },
-        { id: 'doctor-teleconsult', label: 'Tele-consult', icon: videoIcon() },
-      ]},
-      { section: 'Patients', items: [
-        { id: 'doctor-patients', label: 'My Patients', icon: usersIcon() },
-        { id: 'doctor-prescriptions', label: 'Prescriptions', icon: pillIcon() },
-        { id: 'doctor-reports', label: 'Lab Reports', icon: fileIcon(), badge: '3' },
-      ]},
-      { section: 'More', items: [
-        { id: 'doctor-schedule', label: 'My Schedule', icon: calIcon() },
-      ]},
-    ]
-  },
-  patient: {
-    badge: 'Patient Portal',
-    avatar: 'RK',
-    nav: [
-      { section: 'My Health', items: [
-        { id: 'patient-dashboard', label: 'Dashboard', icon: dashIcon() },
-        { id: 'patient-ai', label: 'AI Consultation', icon: aiIcon(), badge: 'New' },
-        { id: 'patient-appointments', label: 'Appointments', icon: calIcon() },
-        { id: 'patient-teleconsult', label: 'Tele-consult', icon: videoIcon() },
-      ]},
-      { section: 'Records', items: [
-        { id: 'patient-prescriptions', label: 'Prescriptions', icon: pillIcon() },
-        { id: 'patient-reports', label: 'My Reports', icon: fileIcon() },
-        { id: 'patient-history', label: 'Health History', icon: heartIcon() },
-      ]},
-    ]
-  }
-};
-
+const roles={admin:{badge:`Admin Dashboard`,avatar:`A`,nav:[{section:`Overview`,items:[{id:`admin-dashboard`,label:`Dashboard`,icon:dashIcon()},{id:`admin-consultations`,label:`Consultations`,icon:videoIcon(),badge:`12`},{id:`admin-revenue`,label:`Revenue`,icon:chartIcon()}]},{section:`Management`,items:[{id:`admin-doctors`,label:`Doctors`,icon:doctorIcon()},{id:`admin-patients`,label:`Patients`,icon:usersIcon()},{id:`admin-reports`,label:`Reports & Labs`,icon:fileIcon()}]},{section:`System`,items:[{id:`admin-settings`,label:`Settings`,icon:settingsIcon()},{id:`admin-cash`,label:`Cash & Commission`,icon:chartIcon(),badge:`3`}]}]},doctor:{badge:`Doctor Portal`,avatar:`Dr`,nav:[{section:`My Practice`,items:[{id:`doctor-dashboard`,label:`Dashboard`,icon:dashIcon()},{id:`doctor-appointments`,label:`Appointments`,icon:calIcon(),badge:`5`},{id:`doctor-teleconsult`,label:`Tele-consult`,icon:videoIcon()}]},{section:`Patients`,items:[{id:`doctor-patients`,label:`My Patients`,icon:usersIcon()},{id:`doctor-prescriptions`,label:`Prescriptions`,icon:pillIcon()},{id:`doctor-reports`,label:`Lab Reports`,icon:fileIcon(),badge:`3`}]},{section:`More`,items:[{id:`doctor-schedule`,label:`My Schedule`,icon:calIcon()}]}]},patient:{badge:`Patient Portal`,avatar:`RK`,nav:[{section:`My Health`,items:[{id:`patient-dashboard`,label:`Dashboard`,icon:dashIcon()},{id:`patient-ai`,label:`AI Consultation`,icon:aiIcon(),badge:`New`},{id:`patient-appointments`,label:`Appointments`,icon:calIcon()},{id:`patient-teleconsult`,label:`Tele-consult`,icon:videoIcon()}]},{section:`Records`,items:[{id:`patient-prescriptions`,label:`Prescriptions`,icon:pillIcon()},{id:`patient-reports`,label:`My Reports`,icon:fileIcon()},{id:`patient-history`,label:`Health History`,icon:heartIcon()}]}]}};
 // ===== ICONS =====
-function dashIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`; }
-function videoIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10l4.55-2.55A1 1 0 0121 8.37v7.26a1 1 0 01-1.45.88L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>`; }
-function chartIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`; }
-function doctorIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`; }
-function usersIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`; }
-function fileIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>`; }
-function calIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`; }
-function settingsIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`; }
-function aiIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73A2 2 0 0110 4a2 2 0 012-2z"/><path d="M9 14h.01M15 14h.01"/></svg>`; }
-function pillIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.5 21.5l11-11a4.25 4.25 0 00-6-6l-11 11a4.25 4.25 0 006 6z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>`; }
-function heartIcon() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`; }
-
+function dashIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`}function videoIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10l4.55-2.55A1 1 0 0121 8.37v7.26a1 1 0 01-1.45.88L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>`}function chartIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>`}function doctorIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`}function usersIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`}function fileIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>`}function calIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`}function settingsIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`}function aiIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73A2 2 0 0110 4a2 2 0 012-2z"/><path d="M9 14h.01M15 14h.01"/></svg>`}function pillIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.5 21.5l11-11a4.25 4.25 0 00-6-6l-11 11a4.25 4.25 0 006 6z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>`}function heartIcon(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`}
 // ===== ROLE SWITCH =====
-function switchRole(role) {
-  currentRole = role;
-  document.getElementById('role-selector').style.display = 'none';
-  document.getElementById('app').classList.add('active');
-  document.getElementById('role-badge').textContent = roles[role].badge;
-  document.getElementById('nav-avatar').textContent = roles[role].avatar;
-  renderSidebar();
-  const firstItem = roles[role].nav[0].items[0];
-  navigate(firstItem.id);
-}
-
-function showRoleSelector() {
-  document.getElementById('role-selector').style.display = 'flex';
-  document.getElementById('app').classList.remove('active');
-}
-
+function switchRole(role){currentRole=role,document.getElementById(`role-selector`).style.display=`none`,document.getElementById(`app`).classList.add(`active`),document.getElementById(`role-badge`).textContent=roles[role].badge,document.getElementById(`nav-avatar`).textContent=roles[role].avatar,renderSidebar();let firstItem=roles[role].nav[0].items[0];navigate(firstItem.id)}function showRoleSelector(){document.getElementById(`role-selector`).style.display=`flex`,document.getElementById(`app`).classList.remove(`active`)}
 // ===== SIDEBAR =====
-function renderSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const cfg = roles[currentRole].nav;
-  let html = '';
-  cfg.forEach(section => {
-    html += `<div class="sidebar-section"><div class="sidebar-section-label">${section.section}</div>`;
-    section.items.forEach(item => {
-      const badgeHtml = item.badge ? `<span class="nav-badge">${item.badge}</span>` : '';
-      html += `<button class="nav-item" id="nav-${item.id}" onclick="navigate('${item.id}')">${item.icon}${item.label}${badgeHtml}</button>`;
-    });
-    html += `</div>`;
-  });
-  sidebar.innerHTML = html;
-}
-
+function renderSidebar(){let sidebar=document.getElementById(`sidebar`),cfg=roles[currentRole].nav,html=``;cfg.forEach(section=>{html+=`<div class="sidebar-section"><div class="sidebar-section-label">${section.section}</div>`,section.items.forEach(item=>{let badgeHtml=item.badge?`<span class="nav-badge">${item.badge}</span>`:``;html+=`<button class="nav-item" id="nav-${item.id}" onclick="navigate('${item.id}')">${item.icon}${item.label}${badgeHtml}</button>`}),html+=`</div>`}),sidebar.innerHTML=html}
 // ===== NAVIGATE =====
-function navigate(pageId) {
-  currentPage = pageId;
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const navEl = document.getElementById(`nav-${pageId}`);
-  if (navEl) navEl.classList.add('active');
-  const content = document.getElementById('content');
-  const pages = {
-    'admin-dashboard': adminDashboard,
-    'admin-consultations': adminConsultations,
-    'admin-revenue': adminRevenue,
-    'admin-doctors': adminDoctors,
-    'admin-patients': adminPatients,
-    'admin-reports': adminReports,
-    'admin-settings': adminSettings,
-    'admin-cash': () => { window.location.href='cash-system.html'; return ''; },
-    'doctor-dashboard': doctorDashboard,
-    'doctor-appointments': doctorAppointments,
-    'doctor-teleconsult': teleconsult,
-    'doctor-patients': doctorPatients,
-    'doctor-prescriptions': doctorPrescriptions,
-    'doctor-reports': doctorReports,
-    'doctor-schedule': doctorSchedule,
-    'patient-dashboard': patientDashboard,
-    'patient-ai': patientAI,
-    'patient-appointments': patientAppointments,
-    'patient-teleconsult': teleconsult,
-    'patient-prescriptions': patientPrescriptions,
-    'patient-reports': patientReports,
-    'patient-history': patientHistory,
-  };
-  if (pages[pageId]) {
-    content.innerHTML = pages[pageId]();
-    initPage(pageId);
-  }
-}
-
-function initPage(pageId) {
-  if (pageId === 'patient-ai') initChat();
-  if (pageId === 'patient-reports' || pageId === 'doctor-reports') initUpload();
-  if (pageId.includes('teleconsult')) initTeleconsult();
-}
-
+function navigate(pageId){currentPage=pageId,document.querySelectorAll(`.nav-item`).forEach(el=>el.classList.remove(`active`));let navEl=document.getElementById(`nav-${pageId}`);navEl&&navEl.classList.add(`active`);let content=document.getElementById(`content`),pages={"admin-dashboard":adminDashboard,"admin-consultations":adminConsultations,"admin-revenue":adminRevenue,"admin-doctors":adminDoctors,"admin-patients":adminPatients,"admin-reports":adminReports,"admin-settings":adminSettings,"admin-cash":()=>(window.location.href=`cash-system.html`,``),"doctor-dashboard":doctorDashboard,"doctor-appointments":doctorAppointments,"doctor-teleconsult":teleconsult,"doctor-patients":doctorPatients,"doctor-prescriptions":doctorPrescriptions,"doctor-reports":doctorReports,"doctor-schedule":doctorSchedule,"patient-dashboard":patientDashboard,"patient-ai":patientAI,"patient-appointments":patientAppointments,"patient-teleconsult":teleconsult,"patient-prescriptions":patientPrescriptions,"patient-reports":patientReports,"patient-history":patientHistory};pages[pageId]&&(content.innerHTML=pages[pageId](),initPage(pageId))}function initPage(pageId){pageId===`patient-ai`&&initChat(),(pageId===`patient-reports`||pageId===`doctor-reports`)&&initUpload(),pageId.includes(`teleconsult`)}
 // ===== ADMIN PAGES =====
-function adminDashboard() {
-  return `
+function adminDashboard(){return`
 <div class="page-header">
   <div class="page-title">Platform Overview</div>
   <div class="page-sub">ArogyaAI — Real-time health platform analytics</div>
@@ -524,7 +49,7 @@ function adminDashboard() {
     <div class="card-title">Consultations This Week <button class="card-link">View all</button></div>
     <div class="chart-bars" id="admin-chart"></div>
     <div style="display:flex;gap:6px;margin-top:10px;justify-content:space-between">
-      ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<span style="font-size:10px;color:var(--text3);flex:1;text-align:center">${d}</span>`).join('')}
+      ${[`Mon`,`Tue`,`Wed`,`Thu`,`Fri`,`Sat`,`Sun`].map(d=>`<span style="font-size:10px;color:var(--text3);flex:1;text-align:center">${d}</span>`).join(``)}
     </div>
     <div style="display:flex;gap:16px;margin-top:14px;">
       <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--teal)"></div>Tele-consult</div>
@@ -534,11 +59,11 @@ function adminDashboard() {
   </div>
   <div class="card">
     <div class="card-title">Top Specialties</div>
-    ${[['General Medicine','64%','var(--teal)'],['Cardiology','48%','var(--blue)'],['Dermatology','39%','var(--purple)'],['Pediatrics','31%','var(--amber)'],['Orthopaedics','22%','var(--coral)']].map(([s,p,c])=>`
+    ${[[`General Medicine`,`64%`,`var(--teal)`],[`Cardiology`,`48%`,`var(--blue)`],[`Dermatology`,`39%`,`var(--purple)`],[`Pediatrics`,`31%`,`var(--amber)`],[`Orthopaedics`,`22%`,`var(--coral)`]].map(([s,p,c])=>`
       <div style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">${s}</span><span style="font-weight:600">${p}</span></div>
         <div class="mini-bar"><div class="mini-bar-fill" style="width:${p};background:${c}"></div></div>
-      </div>`).join('')}
+      </div>`).join(``)}
   </div>
 </div>
 
@@ -548,19 +73,13 @@ function adminDashboard() {
     <table class="data-table">
       <thead><tr><th>Patient</th><th>Doctor</th><th>Type</th><th>Status</th></tr></thead>
       <tbody>
-        ${[
-          ['Rahul Kumar','Dr. Priya Sharma','Tele','Completed'],
-          ['Meena Iyer','Dr. Arun Mehta','AI+Tele','In Progress'],
-          ['Suresh Patel','Dr. Kavya Nair','In-person','Completed'],
-          ['Anita Das','Dr. Raj Singh','Tele','Scheduled'],
-          ['Vijay Rao','Dr. Priya Sharma','AI Consult','Completed'],
-        ].map(([p,d,t,s])=>`
+        ${[[`Rahul Kumar`,`Dr. Priya Sharma`,`Tele`,`Completed`],[`Meena Iyer`,`Dr. Arun Mehta`,`AI+Tele`,`In Progress`],[`Suresh Patel`,`Dr. Kavya Nair`,`In-person`,`Completed`],[`Anita Das`,`Dr. Raj Singh`,`Tele`,`Scheduled`],[`Vijay Rao`,`Dr. Priya Sharma`,`AI Consult`,`Completed`]].map(([p,d,t,s])=>`
           <tr>
             <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--teal-light);color:var(--teal)">${p[0]}</div>${p}</div></td>
             <td style="color:var(--text2)">${d}</td>
-            <td><span class="badge ${t==='Tele'?'badge-blue':t==='AI Consult'?'badge-teal':t==='In-person'?'badge-green':'badge-purple'}">${t}</span></td>
-            <td><span class="badge ${s==='Completed'?'badge-green':s==='In Progress'?'badge-amber':'badge-blue'}">${s}</span></td>
-          </tr>`).join('')}
+            <td><span class="badge ${t===`Tele`?`badge-blue`:t===`AI Consult`?`badge-teal`:t===`In-person`?`badge-green`:`badge-purple`}">${t}</span></td>
+            <td><span class="badge ${s===`Completed`?`badge-green`:s===`In Progress`?`badge-amber`:`badge-blue`}">${s}</span></td>
+          </tr>`).join(``)}
       </tbody>
     </table>
   </div>
@@ -597,11 +116,7 @@ function adminDashboard() {
       </div>
     </div>
   </div>
-</div>`;
-}
-
-function adminConsultations() {
-  return `
+</div>`}function adminConsultations(){return`
 <div class="page-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <div><div class="page-title">All Consultations</div><div class="page-sub">Track every patient-doctor interaction on the platform</div></div>
@@ -622,33 +137,21 @@ function adminConsultations() {
   <table class="data-table">
     <thead><tr><th>#</th><th>Patient</th><th>Doctor</th><th>Specialty</th><th>Type</th><th>Date</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>
-      ${[
-        ['#4821','Rahul Kumar','Dr. Priya Sharma','Gen. Medicine','Tele','Jun 5, 2026','16 min','Completed'],
-        ['#4820','Meena Iyer','Dr. Arun Mehta','Cardiology','AI+Tele','Jun 5, 2026','22 min','In Progress'],
-        ['#4819','Suresh Patel','Dr. Kavya Nair','Dermatology','In-person','Jun 5, 2026','35 min','Completed'],
-        ['#4818','Anita Das','Dr. Raj Singh','Pediatrics','Tele','Jun 5, 2026','—','Scheduled'],
-        ['#4817','Vijay Rao','Dr. Priya Sharma','Gen. Medicine','AI Consult','Jun 4, 2026','8 min','Completed'],
-        ['#4816','Lakshmi N.','Dr. Deepak Roy','Orthopaedics','Tele','Jun 4, 2026','19 min','Completed'],
-        ['#4815','Arjun T.','Dr. Arun Mehta','Cardiology','Tele','Jun 4, 2026','28 min','Completed'],
-      ].map(([id,p,d,sp,t,dt,dur,s])=>`
+      ${[[`#4821`,`Rahul Kumar`,`Dr. Priya Sharma`,`Gen. Medicine`,`Tele`,`Jun 5, 2026`,`16 min`,`Completed`],[`#4820`,`Meena Iyer`,`Dr. Arun Mehta`,`Cardiology`,`AI+Tele`,`Jun 5, 2026`,`22 min`,`In Progress`],[`#4819`,`Suresh Patel`,`Dr. Kavya Nair`,`Dermatology`,`In-person`,`Jun 5, 2026`,`35 min`,`Completed`],[`#4818`,`Anita Das`,`Dr. Raj Singh`,`Pediatrics`,`Tele`,`Jun 5, 2026`,`—`,`Scheduled`],[`#4817`,`Vijay Rao`,`Dr. Priya Sharma`,`Gen. Medicine`,`AI Consult`,`Jun 4, 2026`,`8 min`,`Completed`],[`#4816`,`Lakshmi N.`,`Dr. Deepak Roy`,`Orthopaedics`,`Tele`,`Jun 4, 2026`,`19 min`,`Completed`],[`#4815`,`Arjun T.`,`Dr. Arun Mehta`,`Cardiology`,`Tele`,`Jun 4, 2026`,`28 min`,`Completed`]].map(([id,p,d,sp,t,dt,dur,s])=>`
         <tr>
           <td style="color:var(--text3);font-size:12px">${id}</td>
-          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--teal-light);color:var(--teal);font-size:10px">${p.split(' ').map(w=>w[0]).join('')}</div>${p}</div></td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--teal-light);color:var(--teal);font-size:10px">${p.split(` `).map(w=>w[0]).join(``)}</div>${p}</div></td>
           <td style="color:var(--text2)">${d}</td>
           <td style="color:var(--text2);font-size:12px">${sp}</td>
-          <td><span class="badge ${t.includes('Tele')?'badge-blue':t==='AI Consult'?'badge-teal':t==='In-person'?'badge-green':'badge-purple'}">${t}</span></td>
+          <td><span class="badge ${t.includes(`Tele`)?`badge-blue`:t===`AI Consult`?`badge-teal`:t===`In-person`?`badge-green`:`badge-purple`}">${t}</span></td>
           <td style="color:var(--text2);font-size:12px">${dt}</td>
           <td style="font-size:12px">${dur}</td>
-          <td><span class="badge ${s==='Completed'?'badge-green':s==='In Progress'?'badge-amber':'badge-blue'}">${s}</span></td>
+          <td><span class="badge ${s===`Completed`?`badge-green`:s===`In Progress`?`badge-amber`:`badge-blue`}">${s}</span></td>
           <td><button class="btn btn-secondary btn-sm" onclick="showConsultDetail()">View</button></td>
-        </tr>`).join('')}
+        </tr>`).join(``)}
     </tbody>
   </table>
-</div>`;
-}
-
-function adminRevenue() {
-  return `
+</div>`}function adminRevenue(){return`
 <div class="page-header"><div class="page-title">Revenue Analytics</div><div class="page-sub">Platform earnings, commissions, and financial breakdown</div></div>
 <div class="stats-grid">
   <div class="stat-card"><div class="stat-label">Revenue MTD</div><div class="stat-value">₹9.4L</div><div class="stat-change stat-up">↑ 24% vs last month</div></div>
@@ -659,31 +162,27 @@ function adminRevenue() {
 <div class="grid-2">
   <div class="card">
     <div class="card-title">Revenue by Stream</div>
-    ${[['Tele-consultation commissions','₹1,88,400','38%','var(--teal)'],['Medicine delivery margin','₹3,20,000','32%','var(--blue)'],['Lab referral fees','₹1,10,000','15%','var(--purple)'],['ArogyaPlus subscriptions','₹80,000','10%','var(--amber)'],['AI consult credits','₹41,600','5%','var(--coral)']].map(([l,v,p,c])=>`
+    ${[[`Tele-consultation commissions`,`₹1,88,400`,`38%`,`var(--teal)`],[`Medicine delivery margin`,`₹3,20,000`,`32%`,`var(--blue)`],[`Lab referral fees`,`₹1,10,000`,`15%`,`var(--purple)`],[`ArogyaPlus subscriptions`,`₹80,000`,`10%`,`var(--amber)`],[`AI consult credits`,`₹41,600`,`5%`,`var(--coral)`]].map(([l,v,p,c])=>`
       <div style="margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${l}</span><span style="font-weight:600">${v}</span></div>
         <div class="mini-bar"><div class="mini-bar-fill" style="width:${p};background:${c}"></div></div>
-      </div>`).join('')}
+      </div>`).join(``)}
   </div>
   <div class="card">
     <div class="card-title">Top Earning Doctors (Commission)</div>
     <table class="data-table">
       <thead><tr><th>Doctor</th><th>Consults</th><th>Commission</th></tr></thead>
       <tbody>
-        ${[['Dr. Priya Sharma','Gen. Medicine',148,'₹22,200'],['Dr. Arun Mehta','Cardiology',121,'₹18,150'],['Dr. Kavya Nair','Dermatology',98,'₹14,700'],['Dr. Raj Singh','Pediatrics',87,'₹13,050'],['Dr. Deepak Roy','Ortho',76,'₹11,400']].map(([d,sp,c,e])=>`
+        ${[[`Dr. Priya Sharma`,`Gen. Medicine`,148,`₹22,200`],[`Dr. Arun Mehta`,`Cardiology`,121,`₹18,150`],[`Dr. Kavya Nair`,`Dermatology`,98,`₹14,700`],[`Dr. Raj Singh`,`Pediatrics`,87,`₹13,050`],[`Dr. Deepak Roy`,`Ortho`,76,`₹11,400`]].map(([d,sp,c,e])=>`
           <tr>
-            <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--blue-light);color:var(--blue);font-size:10px">${d.split(' ').slice(1).map(w=>w[0]).join('')}</div><div><div style="font-size:13px">${d}</div><div style="font-size:11px;color:var(--text3)">${sp}</div></div></div></td>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--blue-light);color:var(--blue);font-size:10px">${d.split(` `).slice(1).map(w=>w[0]).join(``)}</div><div><div style="font-size:13px">${d}</div><div style="font-size:11px;color:var(--text3)">${sp}</div></div></div></td>
             <td style="font-weight:600">${c}</td>
             <td style="color:var(--teal);font-weight:600">${e}</td>
-          </tr>`).join('')}
+          </tr>`).join(``)}
       </tbody>
     </table>
   </div>
-</div>`;
-}
-
-function adminDoctors() {
-  return `
+</div>`}function adminDoctors(){return`
 <div class="page-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <div><div class="page-title">Doctor Management</div><div class="page-sub">Verify, manage and monitor all doctors on the platform</div></div>
@@ -699,32 +198,20 @@ function adminDoctors() {
   <table class="data-table">
     <thead><tr><th>Doctor</th><th>Specialty</th><th>Location</th><th>NMC</th><th>Rating</th><th>Consults</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>
-      ${[
-        ['Dr. Priya Sharma','Gen. Medicine','Chennai','Verified','4.9★',148,'Active'],
-        ['Dr. Arun Mehta','Cardiology','Mumbai','Verified','4.8★',121,'Active'],
-        ['Dr. Kavya Nair','Dermatology','Bangalore','Verified','4.7★',98,'Active'],
-        ['Dr. Raj Singh','Pediatrics','Delhi','Verified','4.9★',87,'Active'],
-        ['Dr. Deepak Roy','Orthopaedics','Hyderabad','Verified','4.6★',76,'Active'],
-        ['Dr. Sneha Iyer','Gynaecology','Chennai','Pending','—',0,'Pending'],
-        ['Dr. Kiran Bhat','Neurology','Bangalore','Pending','—',0,'Pending'],
-      ].map(([d,sp,loc,nmc,r,c,s])=>`
+      ${[[`Dr. Priya Sharma`,`Gen. Medicine`,`Chennai`,`Verified`,`4.9★`,148,`Active`],[`Dr. Arun Mehta`,`Cardiology`,`Mumbai`,`Verified`,`4.8★`,121,`Active`],[`Dr. Kavya Nair`,`Dermatology`,`Bangalore`,`Verified`,`4.7★`,98,`Active`],[`Dr. Raj Singh`,`Pediatrics`,`Delhi`,`Verified`,`4.9★`,87,`Active`],[`Dr. Deepak Roy`,`Orthopaedics`,`Hyderabad`,`Verified`,`4.6★`,76,`Active`],[`Dr. Sneha Iyer`,`Gynaecology`,`Chennai`,`Pending`,`—`,0,`Pending`],[`Dr. Kiran Bhat`,`Neurology`,`Bangalore`,`Pending`,`—`,0,`Pending`]].map(([d,sp,loc,nmc,r,c,s])=>`
         <tr>
-          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--blue-light);color:var(--blue);font-size:10px">${d.split(' ').slice(1).map(w=>w[0]).join('')}</div>${d}</div></td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--blue-light);color:var(--blue);font-size:10px">${d.split(` `).slice(1).map(w=>w[0]).join(``)}</div>${d}</div></td>
           <td style="color:var(--text2)">${sp}</td>
           <td style="color:var(--text2)">${loc}</td>
-          <td><span class="badge ${nmc==='Verified'?'badge-green':'badge-amber'}">${nmc}</span></td>
+          <td><span class="badge ${nmc===`Verified`?`badge-green`:`badge-amber`}">${nmc}</span></td>
           <td style="font-weight:600">${r}</td>
           <td>${c}</td>
-          <td><span class="badge ${s==='Active'?'badge-green':'badge-amber'}">${s}</span></td>
-          <td style="display:flex;gap:4px">${s==='Pending'?'<button class="btn btn-primary btn-sm">Verify</button><button class="btn btn-secondary btn-sm">Reject</button>':'<button class="btn btn-secondary btn-sm">View</button>'}</td>
-        </tr>`).join('')}
+          <td><span class="badge ${s===`Active`?`badge-green`:`badge-amber`}">${s}</span></td>
+          <td style="display:flex;gap:4px">${s===`Pending`?`<button class="btn btn-primary btn-sm">Verify</button><button class="btn btn-secondary btn-sm">Reject</button>`:`<button class="btn btn-secondary btn-sm">View</button>`}</td>
+        </tr>`).join(``)}
     </tbody>
   </table>
-</div>`;
-}
-
-function adminPatients() {
-  return `
+</div>`}function adminPatients(){return`
 <div class="page-header"><div class="page-title">Patient Management</div><div class="page-sub">18,493 registered patients on ArogyaAI</div></div>
 <div class="stats-grid">
   <div class="stat-card"><div class="stat-label">Total Patients</div><div class="stat-value">18,493</div><div class="stat-change stat-up">↑ 1,200 this week</div></div>
@@ -737,31 +224,20 @@ function adminPatients() {
   <table class="data-table">
     <thead><tr><th>Patient</th><th>Age</th><th>City</th><th>ABHA</th><th>Last Consult</th><th>Consults</th><th>Plan</th><th>Actions</th></tr></thead>
     <tbody>
-      ${[
-        ['Rahul Kumar','M, 34','Chennai','Linked','Jun 5, 2026',12,'ArogyaPlus'],
-        ['Meena Iyer','F, 52','Coimbatore','Linked','Jun 5, 2026',8,'Free'],
-        ['Suresh Patel','M, 28','Ahmedabad','Linked','Jun 5, 2026',3,'Free'],
-        ['Anita Das','F, 41','Kolkata','Pending','Jun 4, 2026',6,'ArogyaPlus'],
-        ['Vijay Rao','M, 63','Bangalore','Linked','Jun 4, 2026',21,'ArogyaPlus'],
-        ['Lakshmi N.','F, 38','Hyderabad','Linked','Jun 4, 2026',9,'Free'],
-      ].map(([n,a,c,ab,lc,co,pl])=>`
+      ${[[`Rahul Kumar`,`M, 34`,`Chennai`,`Linked`,`Jun 5, 2026`,12,`ArogyaPlus`],[`Meena Iyer`,`F, 52`,`Coimbatore`,`Linked`,`Jun 5, 2026`,8,`Free`],[`Suresh Patel`,`M, 28`,`Ahmedabad`,`Linked`,`Jun 5, 2026`,3,`Free`],[`Anita Das`,`F, 41`,`Kolkata`,`Pending`,`Jun 4, 2026`,6,`ArogyaPlus`],[`Vijay Rao`,`M, 63`,`Bangalore`,`Linked`,`Jun 4, 2026`,21,`ArogyaPlus`],[`Lakshmi N.`,`F, 38`,`Hyderabad`,`Linked`,`Jun 4, 2026`,9,`Free`]].map(([n,a,c,ab,lc,co,pl])=>`
         <tr>
           <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--purple-light);color:var(--purple);font-size:10px">${n[0]}</div>${n}</div></td>
           <td style="color:var(--text2)">${a}</td>
           <td style="color:var(--text2)">${c}</td>
-          <td><span class="badge ${ab==='Linked'?'badge-green':'badge-amber'}">${ab}</span></td>
+          <td><span class="badge ${ab===`Linked`?`badge-green`:`badge-amber`}">${ab}</span></td>
           <td style="color:var(--text2);font-size:12px">${lc}</td>
           <td style="font-weight:600">${co}</td>
-          <td><span class="badge ${pl==='ArogyaPlus'?'badge-purple':'badge-blue'}">${pl}</span></td>
+          <td><span class="badge ${pl===`ArogyaPlus`?`badge-purple`:`badge-blue`}">${pl}</span></td>
           <td><button class="btn btn-secondary btn-sm">View</button></td>
-        </tr>`).join('')}
+        </tr>`).join(``)}
     </tbody>
   </table>
-</div>`;
-}
-
-function adminReports() {
-  return `
+</div>`}function adminReports(){return`
 <div class="page-header"><div class="page-title">Reports & Diagnostics</div><div class="page-sub">All uploaded patient reports, lab results, and disease images</div></div>
 <div class="stats-grid">
   <div class="stat-card"><div class="stat-label">Total Uploads</div><div class="stat-value">6,842</div><div class="stat-change stat-up">↑ 284 today</div></div>
@@ -774,28 +250,18 @@ function adminReports() {
   <table class="data-table">
     <thead><tr><th>File</th><th>Patient</th><th>Type</th><th>Uploaded</th><th>Reviewed by</th><th>Actions</th></tr></thead>
     <tbody>
-      ${[
-        ['CBC_Report_Rahul.pdf','Rahul Kumar','Lab Report','Jun 5, 2026','Dr. Priya Sharma'],
-        ['Skin_Rash_Photo.jpg','Meena Iyer','Disease Image','Jun 5, 2026','Dr. Kavya Nair'],
-        ['Chest_Xray.pdf','Vijay Rao','Radiology','Jun 4, 2026','Dr. Arun Mehta'],
-        ['Blood_Sugar_Log.pdf','Anita Das','Lab Report','Jun 4, 2026','Pending'],
-        ['Knee_MRI.pdf','Suresh Patel','Radiology','Jun 3, 2026','Dr. Deepak Roy'],
-      ].map(([f,p,t,d,r])=>`
+      ${[[`CBC_Report_Rahul.pdf`,`Rahul Kumar`,`Lab Report`,`Jun 5, 2026`,`Dr. Priya Sharma`],[`Skin_Rash_Photo.jpg`,`Meena Iyer`,`Disease Image`,`Jun 5, 2026`,`Dr. Kavya Nair`],[`Chest_Xray.pdf`,`Vijay Rao`,`Radiology`,`Jun 4, 2026`,`Dr. Arun Mehta`],[`Blood_Sugar_Log.pdf`,`Anita Das`,`Lab Report`,`Jun 4, 2026`,`Pending`],[`Knee_MRI.pdf`,`Suresh Patel`,`Radiology`,`Jun 3, 2026`,`Dr. Deepak Roy`]].map(([f,p,t,d,r])=>`
         <tr>
-          <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${f.endsWith('.pdf')?'📄':'🖼️'}</span><span style="font-size:13px">${f}</span></div></td>
+          <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${f.endsWith(`.pdf`)?`📄`:`🖼️`}</span><span style="font-size:13px">${f}</span></div></td>
           <td>${p}</td>
-          <td><span class="badge ${t==='Lab Report'?'badge-blue':t==='Disease Image'?'badge-coral':'badge-purple'}">${t}</span></td>
+          <td><span class="badge ${t===`Lab Report`?`badge-blue`:t===`Disease Image`?`badge-coral`:`badge-purple`}">${t}</span></td>
           <td style="color:var(--text2);font-size:12px">${d}</td>
-          <td style="font-size:12px;color:${r==='Pending'?'var(--amber)':'var(--text2)'}">${r}</td>
+          <td style="font-size:12px;color:${r===`Pending`?`var(--amber)`:`var(--text2)`}">${r}</td>
           <td><button class="btn btn-secondary btn-sm">View</button></td>
-        </tr>`).join('')}
+        </tr>`).join(``)}
     </tbody>
   </table>
-</div>`;
-}
-
-function adminSettings() {
-  return `<div class="page-header"><div class="page-title">Platform Settings</div><div class="page-sub">Configure ArogyaAI platform preferences</div></div>
+</div>`}function adminSettings(){return`<div class="page-header"><div class="page-title">Platform Settings</div><div class="page-sub">Configure ArogyaAI platform preferences</div></div>
   <div class="grid-2">
     <div class="card"><div class="card-title">Commission Settings</div>
       <div class="form-group"><label class="form-label">Tele-consultation commission (%)</label><input class="form-input" type="number" value="20"></div>
@@ -804,21 +270,18 @@ function adminSettings() {
       <button class="btn btn-primary">Save Changes</button>
     </div>
     <div class="card"><div class="card-title">Notification Settings</div>
-      ${[['WhatsApp alerts for new consultations','true'],['Email digest (daily)','true'],['SMS OTP for prescriptions','true'],['Doctor onboarding alerts','false']].map(([l,v])=>`
+      ${[[`WhatsApp alerts for new consultations`,`true`],[`Email digest (daily)`,`true`],[`SMS OTP for prescriptions`,`true`],[`Doctor onboarding alerts`,`false`]].map(([l,v])=>`
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
           <span style="font-size:13px">${l}</span>
           <label style="position:relative;width:36px;height:20px;cursor:pointer">
-            <input type="checkbox" ${v==='true'?'checked':''} style="opacity:0;width:0;height:0">
-            <span style="position:absolute;inset:0;background:${v==='true'?'var(--teal)':'var(--border)'};border-radius:10px;transition:0.2s"></span>
+            <input type="checkbox" ${v===`true`?`checked`:``} style="opacity:0;width:0;height:0">
+            <span style="position:absolute;inset:0;background:${v===`true`?`var(--teal)`:`var(--border)`};border-radius:10px;transition:0.2s"></span>
           </label>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
-  </div>`;
-}
-
+  </div>`}
 // ===== DOCTOR PAGES =====
-function doctorDashboard() {
-  return `
+function doctorDashboard(){return`
 <div class="page-header">
   <div class="page-title">Good morning, Dr. Priya 👋</div>
   <div class="page-sub">You have 8 appointments and 3 pending lab reports today</div>
@@ -833,30 +296,24 @@ function doctorDashboard() {
   <div>
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">Today's Schedule <button class="card-link" onclick="navigate('doctor-appointments')">Full view</button></div>
-      ${[
-        ['9:00 AM','Rahul Kumar','Fever & cough','Tele','Completed'],
-        ['10:30 AM','Meena Iyer','Chest pain followup','Tele','In Progress'],
-        ['11:30 AM','Suresh Patel','Skin rash','In-person','Upcoming'],
-        ['2:00 PM','Anita Das','Diabetes checkup','In-person','Upcoming'],
-        ['3:30 PM','Vijay Rao','Knee pain','Tele','Upcoming'],
-      ].map(([t,p,r,ty,s])=>`
+      ${[[`9:00 AM`,`Rahul Kumar`,`Fever & cough`,`Tele`,`Completed`],[`10:30 AM`,`Meena Iyer`,`Chest pain followup`,`Tele`,`In Progress`],[`11:30 AM`,`Suresh Patel`,`Skin rash`,`In-person`,`Upcoming`],[`2:00 PM`,`Anita Das`,`Diabetes checkup`,`In-person`,`Upcoming`],[`3:30 PM`,`Vijay Rao`,`Knee pain`,`Tele`,`Upcoming`]].map(([t,p,r,ty,s])=>`
         <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
           <div style="font-size:12px;color:var(--text3);min-width:56px;font-weight:500">${t}</div>
-          <div class="avatar" style="background:var(--teal-light);color:var(--teal);font-size:10px">${p.split(' ').map(w=>w[0]).join('')}</div>
+          <div class="avatar" style="background:var(--teal-light);color:var(--teal);font-size:10px">${p.split(` `).map(w=>w[0]).join(``)}</div>
           <div style="flex:1"><div style="font-size:13px;font-weight:500">${p}</div><div style="font-size:11px;color:var(--text3)">${r}</div></div>
-          <span class="badge ${ty==='Tele'?'badge-blue':'badge-green'}">${ty}</span>
-          <span class="badge ${s==='Completed'?'badge-green':s==='In Progress'?'badge-amber':'badge-blue'}">${s}</span>
-          ${s!=='Completed'?`<button class="btn btn-primary btn-sm" onclick="navigate('doctor-teleconsult')">Join</button>`:''}
-        </div>`).join('')}
+          <span class="badge ${ty===`Tele`?`badge-blue`:`badge-green`}">${ty}</span>
+          <span class="badge ${s===`Completed`?`badge-green`:s===`In Progress`?`badge-amber`:`badge-blue`}">${s}</span>
+          ${s===`Completed`?``:`<button class="btn btn-primary btn-sm" onclick="navigate('doctor-teleconsult')">Join</button>`}
+        </div>`).join(``)}
     </div>
     <div class="card">
       <div class="card-title">Pending Lab Reports <span class="badge badge-amber">3</span></div>
-      ${[['CBC Report','Rahul Kumar','Jun 4'],['Blood Sugar','Anita Das','Jun 4'],['Thyroid Panel','Meena Iyer','Jun 3']].map(([r,p,d])=>`
+      ${[[`CBC Report`,`Rahul Kumar`,`Jun 4`],[`Blood Sugar`,`Anita Das`,`Jun 4`],[`Thyroid Panel`,`Meena Iyer`,`Jun 3`]].map(([r,p,d])=>`
         <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
           <span style="font-size:20px">📄</span>
           <div style="flex:1"><div style="font-size:13px;font-weight:500">${r}</div><div style="font-size:11px;color:var(--text3)">${p} · Uploaded ${d}</div></div>
           <button class="btn btn-primary btn-sm">Review</button>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
   </div>
   <div>
@@ -871,62 +328,41 @@ function doctorDashboard() {
     </div>
     <div class="card">
       <div class="card-title">Patient Conditions Today</div>
-      ${[['General illness','42%','var(--teal)'],['Chronic followup','28%','var(--blue)'],['Skin conditions','18%','var(--purple)'],['Other','12%','var(--amber)']].map(([l,p,c])=>`
+      ${[[`General illness`,`42%`,`var(--teal)`],[`Chronic followup`,`28%`,`var(--blue)`],[`Skin conditions`,`18%`,`var(--purple)`],[`Other`,`12%`,`var(--amber)`]].map(([l,p,c])=>`
         <div style="margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">${l}</span><span style="font-weight:600">${p}</span></div>
           <div class="mini-bar"><div class="mini-bar-fill" style="width:${p};background:${c}"></div></div>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
   </div>
-</div>`;
-}
-
-function doctorAppointments() {
-  return `
+</div>`}function doctorAppointments(){return`
 <div class="page-header"><div class="page-title">Appointments</div><div class="page-sub">Manage all your patient appointments</div></div>
 <div class="card">
   <div class="card-title">All Appointments</div>
   <table class="data-table">
     <thead><tr><th>Time</th><th>Patient</th><th>Reason</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>
-      ${[
-        ['9:00 AM','Rahul Kumar','Fever & cough','Tele','Completed'],
-        ['10:30 AM','Meena Iyer','Chest pain followup','Tele','In Progress'],
-        ['11:30 AM','Suresh Patel','Skin rash','In-person','Upcoming'],
-        ['2:00 PM','Anita Das','Diabetes checkup','In-person','Upcoming'],
-        ['3:30 PM','Vijay Rao','Knee pain','Tele','Upcoming'],
-        ['4:30 PM','Lakshmi N.','General checkup','Tele','Upcoming'],
-      ].map(([t,p,r,ty,s])=>`
+      ${[[`9:00 AM`,`Rahul Kumar`,`Fever & cough`,`Tele`,`Completed`],[`10:30 AM`,`Meena Iyer`,`Chest pain followup`,`Tele`,`In Progress`],[`11:30 AM`,`Suresh Patel`,`Skin rash`,`In-person`,`Upcoming`],[`2:00 PM`,`Anita Das`,`Diabetes checkup`,`In-person`,`Upcoming`],[`3:30 PM`,`Vijay Rao`,`Knee pain`,`Tele`,`Upcoming`],[`4:30 PM`,`Lakshmi N.`,`General checkup`,`Tele`,`Upcoming`]].map(([t,p,r,ty,s])=>`
         <tr>
           <td style="font-weight:500;font-size:12px">${t}</td>
-          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--teal-light);color:var(--teal);font-size:10px">${p.split(' ').map(w=>w[0]).join('')}</div>${p}</div></td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--teal-light);color:var(--teal);font-size:10px">${p.split(` `).map(w=>w[0]).join(``)}</div>${p}</div></td>
           <td style="color:var(--text2)">${r}</td>
-          <td><span class="badge ${ty==='Tele'?'badge-blue':'badge-green'}">${ty}</span></td>
-          <td><span class="badge ${s==='Completed'?'badge-green':s==='In Progress'?'badge-amber':'badge-blue'}">${s}</span></td>
+          <td><span class="badge ${ty===`Tele`?`badge-blue`:`badge-green`}">${ty}</span></td>
+          <td><span class="badge ${s===`Completed`?`badge-green`:s===`In Progress`?`badge-amber`:`badge-blue`}">${s}</span></td>
           <td style="display:flex;gap:4px">
-            ${s!=='Completed'?`<button class="btn btn-primary btn-sm" onclick="navigate('doctor-teleconsult')">Join</button>`:''}
+            ${s===`Completed`?``:`<button class="btn btn-primary btn-sm" onclick="navigate('doctor-teleconsult')">Join</button>`}
             <button class="btn btn-secondary btn-sm" onclick="openPrescModal('${p}')">Rx</button>
           </td>
-        </tr>`).join('')}
+        </tr>`).join(``)}
     </tbody>
   </table>
-</div>`;
-}
-
-function doctorPatients() {
-  return `
+</div>`}function doctorPatients(){return`
 <div class="page-header"><div class="page-title">My Patients</div><div class="page-sub">All patients who have consulted with you</div></div>
 <div class="card">
   <table class="data-table">
     <thead><tr><th>Patient</th><th>Age</th><th>Last Visit</th><th>Condition</th><th>Prescriptions</th><th>Reports</th><th>Actions</th></tr></thead>
     <tbody>
-      ${[
-        ['Rahul Kumar','M, 34','Jun 5, 2026','General illness',3,2],
-        ['Meena Iyer','F, 52','Jun 5, 2026','Hypertension',8,5],
-        ['Suresh Patel','M, 28','Jun 5, 2026','Skin rash',1,1],
-        ['Anita Das','F, 41','Jun 4, 2026','Type 2 Diabetes',12,8],
-        ['Vijay Rao','M, 63','Jun 4, 2026','Osteoarthritis',6,4],
-      ].map(([n,a,lv,c,rx,r])=>`
+      ${[[`Rahul Kumar`,`M, 34`,`Jun 5, 2026`,`General illness`,3,2],[`Meena Iyer`,`F, 52`,`Jun 5, 2026`,`Hypertension`,8,5],[`Suresh Patel`,`M, 28`,`Jun 5, 2026`,`Skin rash`,1,1],[`Anita Das`,`F, 41`,`Jun 4, 2026`,`Type 2 Diabetes`,12,8],[`Vijay Rao`,`M, 63`,`Jun 4, 2026`,`Osteoarthritis`,6,4]].map(([n,a,lv,c,rx,r])=>`
         <tr>
           <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--purple-light);color:var(--purple);font-size:10px">${n[0]}</div>${n}</div></td>
           <td style="color:var(--text2)">${a}</td>
@@ -938,14 +374,10 @@ function doctorPatients() {
             <button class="btn btn-secondary btn-sm">History</button>
             <button class="btn btn-primary btn-sm" onclick="openPrescModal('${n}')">Write Rx</button>
           </td>
-        </tr>`).join('')}
+        </tr>`).join(``)}
     </tbody>
   </table>
-</div>`;
-}
-
-function doctorPrescriptions() {
-  return `
+</div>`}function doctorPrescriptions(){return`
 <div class="page-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <div><div class="page-title">Prescriptions</div><div class="page-sub">All prescriptions you've issued on ArogyaAI</div></div>
@@ -975,33 +407,20 @@ function doctorPrescriptions() {
   <div>
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">Recent Prescriptions</div>
-      ${[
-        ['Rahul Kumar','Azithromycin 500mg','Jun 5, 2026'],
-        ['Meena Iyer','Amlodipine 5mg','Jun 5, 2026'],
-        ['Anita Das','Metformin 500mg','Jun 4, 2026'],
-        ['Vijay Rao','Diclofenac 75mg','Jun 4, 2026'],
-      ].map(([p,d,dt])=>`
+      ${[[`Rahul Kumar`,`Azithromycin 500mg`,`Jun 5, 2026`],[`Meena Iyer`,`Amlodipine 5mg`,`Jun 5, 2026`],[`Anita Das`,`Metformin 500mg`,`Jun 4, 2026`],[`Vijay Rao`,`Diclofenac 75mg`,`Jun 4, 2026`]].map(([p,d,dt])=>`
         <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
           <div class="avatar" style="background:var(--blue-light);color:var(--blue);font-size:10px">${p[0]}</div>
           <div style="flex:1"><div style="font-size:13px;font-weight:500">${p}</div><div style="font-size:11px;color:var(--text3)">${d}</div></div>
           <div style="font-size:11px;color:var(--text3)">${dt}</div>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
   </div>
-</div>`;
-}
-
-function doctorReports() {
-  return `
+</div>`}function doctorReports(){return`
 <div class="page-header"><div class="page-title">Lab Reports</div><div class="page-sub">Patient uploaded reports awaiting your review</div></div>
 <div class="grid-2">
   <div class="card">
     <div class="card-title">Pending Review <span class="badge badge-amber">3</span></div>
-    ${[
-      ['CBC_Report_Rahul.pdf','Rahul Kumar','Complete Blood Count','Jun 5, 2026','📄'],
-      ['Skin_Rash_Photo.jpg','Meena Iyer','Disease Image · Skin','Jun 5, 2026','🖼️'],
-      ['Thyroid_Panel.pdf','Anita Das','Thyroid Function Test','Jun 3, 2026','📄'],
-    ].map(([f,p,t,d,ic])=>`
+    ${[[`CBC_Report_Rahul.pdf`,`Rahul Kumar`,`Complete Blood Count`,`Jun 5, 2026`,`📄`],[`Skin_Rash_Photo.jpg`,`Meena Iyer`,`Disease Image · Skin`,`Jun 5, 2026`,`🖼️`],[`Thyroid_Panel.pdf`,`Anita Das`,`Thyroid Function Test`,`Jun 3, 2026`,`📄`]].map(([f,p,t,d,ic])=>`
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <span style="font-size:24px">${ic}</span>
@@ -1009,15 +428,11 @@ function doctorReports() {
         </div>
         <div class="form-group" style="margin-bottom:8px"><textarea class="form-input form-textarea" placeholder="Add your clinical notes for this report..." style="min-height:60px"></textarea></div>
         <div style="display:flex;gap:6px"><button class="btn btn-primary btn-sm">✓ Mark Reviewed</button><button class="btn btn-secondary btn-sm">Download</button></div>
-      </div>`).join('')}
+      </div>`).join(``)}
   </div>
   <div class="card">
     <div class="card-title">Reviewed Reports</div>
-    ${[
-      ['Blood_Sugar_Log.pdf','Anita Das','Jun 4','Normal range — continue medication'],
-      ['Chest_Xray.pdf','Vijay Rao','Jun 3','No acute findings'],
-      ['ECG_Report.pdf','Meena Iyer','Jun 2','Mild tachycardia — monitor'],
-    ].map(([f,p,d,n])=>`
+    ${[[`Blood_Sugar_Log.pdf`,`Anita Das`,`Jun 4`,`Normal range — continue medication`],[`Chest_Xray.pdf`,`Vijay Rao`,`Jun 3`,`No acute findings`],[`ECG_Report.pdf`,`Meena Iyer`,`Jun 2`,`Mild tachycardia — monitor`]].map(([f,p,d,n])=>`
       <div style="padding:10px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
           <span style="font-size:16px">📄</span>
@@ -1025,25 +440,21 @@ function doctorReports() {
           <div style="margin-left:auto;font-size:11px;color:var(--text3)">${d}</div>
         </div>
         <div style="font-size:12px;color:var(--text2);margin-left:24px">${p} · <span style="color:var(--teal)">${n}</span></div>
-      </div>`).join('')}
+      </div>`).join(``)}
   </div>
-</div>`;
-}
-
-function doctorSchedule() {
-  return `
+</div>`}function doctorSchedule(){return`
 <div class="page-header"><div class="page-title">My Schedule</div><div class="page-sub">Set your availability for tele and in-person consultations</div></div>
 <div class="grid-2">
   <div class="card">
     <div class="card-title">Weekly Availability</div>
-    ${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map((d,i)=>`
+    ${[`Monday`,`Tuesday`,`Wednesday`,`Thursday`,`Friday`,`Saturday`,`Sunday`].map((d,i)=>`
       <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
         <div style="min-width:90px;font-size:13px;font-weight:500">${d}</div>
-        <input type="time" class="form-input" style="width:110px" value="${i<5?'09:00':''}">
+        <input type="time" class="form-input" style="width:110px" value="${i<5?`09:00`:``}">
         <span style="color:var(--text3)">–</span>
-        <input type="time" class="form-input" style="width:110px" value="${i<5?'18:00':i===5?'13:00':''}">
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2)"><input type="checkbox" ${i<5?'checked':i===5?'checked':''}> Active</label>
-      </div>`).join('')}
+        <input type="time" class="form-input" style="width:110px" value="${i<5?`18:00`:i===5?`13:00`:``}">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2)"><input type="checkbox" ${i<5||i===5?`checked`:``}> Active</label>
+      </div>`).join(``)}
     <button class="btn btn-primary" style="margin-top:16px">Save Schedule</button>
   </div>
   <div class="card">
@@ -1054,12 +465,9 @@ function doctorSchedule() {
     <div class="form-group"><label class="form-label">Max patients per day</label><input class="form-input" value="20"></div>
     <button class="btn btn-primary">Update Settings</button>
   </div>
-</div>`;
-}
-
+</div>`}
 // ===== PATIENT PAGES =====
-function patientDashboard() {
-  return `
+function patientDashboard(){return`
 <div class="page-header">
   <div class="page-title">Namaste, Rahul 🙏</div>
   <div class="page-sub">Your health summary — ArogyaAI Member since Jan 2026</div>
@@ -1140,11 +548,7 @@ function patientDashboard() {
       </div>
     </div>
   </div>
-</div>`;
-}
-
-function patientAI() {
-  return `
+</div>`}function patientAI(){return`
 <div class="page-header">
   <div class="page-title">AI Health Consultation</div>
   <div class="page-sub">Powered by Claude · Available 24/7 · Not a substitute for professional medical advice</div>
@@ -1162,7 +566,7 @@ function patientAI() {
           <strong>What's bothering you today?</strong>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-          ${['I have a fever 🌡️','Chest pain or breathlessness','Skin rash or irritation','Headache & fatigue','Upload a symptom photo'].map(s=>`<button class="btn btn-secondary btn-sm" onclick="quickSend('${s}')">${s}</button>`).join('')}
+          ${[`I have a fever 🌡️`,`Chest pain or breathlessness`,`Skin rash or irritation`,`Headache & fatigue`,`Upload a symptom photo`].map(s=>`<button class="btn btn-secondary btn-sm" onclick="quickSend('${s}')">${s}</button>`).join(``)}
         </div>
       </div>
     </div>
@@ -1188,11 +592,7 @@ function patientAI() {
     </div>
     <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3)">ArogyaAI uses Claude AI. Always consult a qualified doctor for diagnosis and treatment.</div>
   </div>
-</div>`;
-}
-
-function patientAppointments() {
-  return `
+</div>`}function patientAppointments(){return`
 <div class="page-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <div><div class="page-title">Book Appointment</div><div class="page-sub">Find verified doctors and book instantly</div></div>
@@ -1206,14 +606,9 @@ function patientAppointments() {
   </div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px">
-  ${[
-    ['Dr. Priya Sharma','General Medicine','MBBS, MD · 12 yrs exp','Chennai','4.9★ (148 reviews)','₹500','Available today'],
-    ['Dr. Kavya Nair','Dermatology','MBBS, DVD · 8 yrs exp','Bangalore','4.7★ (98 reviews)','₹600','Next slot: Jun 7'],
-    ['Dr. Raj Singh','Pediatrics','MBBS, DCH · 15 yrs exp','Delhi','4.9★ (87 reviews)','₹550','Available today'],
-    ['Dr. Arun Mehta','Cardiology','MBBS, DM · 20 yrs exp','Mumbai','4.8★ (121 reviews)','₹900','Next slot: Jun 8'],
-  ].map(([n,sp,q,loc,r,fee,av])=>`
+  ${[[`Dr. Priya Sharma`,`General Medicine`,`MBBS, MD · 12 yrs exp`,`Chennai`,`4.9★ (148 reviews)`,`₹500`,`Available today`],[`Dr. Kavya Nair`,`Dermatology`,`MBBS, DVD · 8 yrs exp`,`Bangalore`,`4.7★ (98 reviews)`,`₹600`,`Next slot: Jun 7`],[`Dr. Raj Singh`,`Pediatrics`,`MBBS, DCH · 15 yrs exp`,`Delhi`,`4.9★ (87 reviews)`,`₹550`,`Available today`],[`Dr. Arun Mehta`,`Cardiology`,`MBBS, DM · 20 yrs exp`,`Mumbai`,`4.8★ (121 reviews)`,`₹900`,`Next slot: Jun 8`]].map(([n,sp,q,loc,r,fee,av])=>`
     <div class="card" style="display:flex;align-items:center;gap:16px">
-      <div class="avatar" style="width:52px;height:52px;background:var(--blue-light);color:var(--blue);font-size:16px">${n.split(' ').slice(1).map(w=>w[0]).join('')}</div>
+      <div class="avatar" style="width:52px;height:52px;background:var(--blue-light);color:var(--blue);font-size:16px">${n.split(` `).slice(1).map(w=>w[0]).join(``)}</div>
       <div style="flex:1">
         <div style="font-size:15px;font-weight:600">${n}</div>
         <div style="font-size:12px;color:var(--teal);font-weight:500">${sp}</div>
@@ -1223,21 +618,14 @@ function patientAppointments() {
       <div style="text-align:right">
         <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--teal)">${fee}</div>
         <div style="font-size:11px;color:var(--text3)">per consult</div>
-        <div style="font-size:11px;margin-bottom:8px;color:${av.includes('today')?'var(--green)':'var(--text2)'}">${av}</div>
+        <div style="font-size:11px;margin-bottom:8px;color:${av.includes(`today`)?`var(--green)`:`var(--text2)`}">${av}</div>
         <button class="btn btn-primary btn-sm" onclick="openBookModal('${n}')">Book Now</button>
       </div>
-    </div>`).join('')}
-</div>`;
-}
-
-function patientPrescriptions() {
-  return `
+    </div>`).join(``)}
+</div>`}function patientPrescriptions(){return`
 <div class="page-header"><div class="page-title">My Prescriptions</div><div class="page-sub">All prescriptions issued by your doctors on ArogyaAI</div></div>
 <div style="display:flex;flex-direction:column;gap:16px">
-  ${[
-    {doc:'Dr. Priya Sharma',date:'Jun 5, 2026',diag:'Acute upper respiratory infection',drugs:[['Azithromycin 500mg','1 tab daily × 5 days · After food'],['Paracetamol 650mg','SOS every 6 hrs if temp >100°F'],['ORS Sachet','Twice daily in 1L water']],inst:'Rest well. Stay hydrated. Avoid cold food.',followup:'Jun 12, 2026'},
-    {doc:'Dr. Priya Sharma',date:'May 12, 2026',diag:'Viral fever with myalgia',drugs:[['Paracetamol 500mg','TID × 3 days'],['Cetirizine 10mg','At bedtime × 5 days']],inst:'Light diet. No spicy food.',followup:'May 19, 2026'},
-  ].map((rx,i)=>`
+  ${[{doc:`Dr. Priya Sharma`,date:`Jun 5, 2026`,diag:`Acute upper respiratory infection`,drugs:[[`Azithromycin 500mg`,`1 tab daily × 5 days · After food`],[`Paracetamol 650mg`,`SOS every 6 hrs if temp >100°F`],[`ORS Sachet`,`Twice daily in 1L water`]],inst:`Rest well. Stay hydrated. Avoid cold food.`,followup:`Jun 12, 2026`},{doc:`Dr. Priya Sharma`,date:`May 12, 2026`,diag:`Viral fever with myalgia`,drugs:[[`Paracetamol 500mg`,`TID × 3 days`],[`Cetirizine 10mg`,`At bedtime × 5 days`]],inst:`Light diet. No spicy food.`,followup:`May 19, 2026`}].map((rx,i)=>`
     <div class="rx-card">
       <div class="rx-header">
         <div style="flex:1">
@@ -1250,14 +638,10 @@ function patientPrescriptions() {
         </div>
         <button class="btn btn-secondary btn-sm">Download PDF</button>
       </div>
-      ${rx.drugs.map(([n,d])=>`<div class="rx-drug"><span class="rx-drug-name">${n}</span><span class="rx-drug-dose">${d}</span></div>`).join('')}
+      ${rx.drugs.map(([n,d])=>`<div class="rx-drug"><span class="rx-drug-name">${n}</span><span class="rx-drug-dose">${d}</span></div>`).join(``)}
       <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #B8E8D0;font-size:12px;color:var(--text2)">📝 <strong>Instructions:</strong> ${rx.inst}<br>📅 <strong>Follow-up:</strong> ${rx.followup}</div>
-    </div>`).join('')}
-</div>`;
-}
-
-function patientReports() {
-  return `
+    </div>`).join(``)}
+</div>`}function patientReports(){return`
 <div class="page-header"><div class="page-title">My Reports</div><div class="page-sub">Upload lab reports, X-rays, or photos of skin conditions / symptoms</div></div>
 <div class="grid-2">
   <div>
@@ -1286,37 +670,20 @@ function patientReports() {
   </div>
   <div class="card">
     <div class="card-title">My Uploaded Reports</div>
-    ${[
-      ['CBC_Report_Jun5.pdf','Lab Report','Jun 5, 2026','Reviewed ✓','badge-green'],
-      ['Skin_Rash_Photo.jpg','Disease Image','Jun 3, 2026','Reviewed ✓','badge-green'],
-      ['Chest_Xray_May.pdf','Radiology','May 28, 2026','Pending review','badge-amber'],
-      ['Blood_Sugar_Log.pdf','Lab Report','May 20, 2026','Reviewed ✓','badge-green'],
-      ['Thyroid_Panel.pdf','Lab Report','May 10, 2026','Reviewed ✓','badge-green'],
-    ].map(([f,t,d,s,bc])=>`
+    ${[[`CBC_Report_Jun5.pdf`,`Lab Report`,`Jun 5, 2026`,`Reviewed ✓`,`badge-green`],[`Skin_Rash_Photo.jpg`,`Disease Image`,`Jun 3, 2026`,`Reviewed ✓`,`badge-green`],[`Chest_Xray_May.pdf`,`Radiology`,`May 28, 2026`,`Pending review`,`badge-amber`],[`Blood_Sugar_Log.pdf`,`Lab Report`,`May 20, 2026`,`Reviewed ✓`,`badge-green`],[`Thyroid_Panel.pdf`,`Lab Report`,`May 10, 2026`,`Reviewed ✓`,`badge-green`]].map(([f,t,d,s,bc])=>`
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-        <span style="font-size:22px">${f.endsWith('.pdf')?'📄':'🖼️'}</span>
+        <span style="font-size:22px">${f.endsWith(`.pdf`)?`📄`:`🖼️`}</span>
         <div style="flex:1"><div style="font-size:13px;font-weight:500">${f}</div><div style="font-size:11px;color:var(--text3)">${t} · ${d}</div></div>
         <span class="badge ${bc}" style="font-size:10px">${s}</span>
-      </div>`).join('')}
+      </div>`).join(``)}
   </div>
-</div>`;
-}
-
-function patientHistory() {
-  return `
+</div>`}function patientHistory(){return`
 <div class="page-header"><div class="page-title">Health History</div><div class="page-sub">Your complete medical timeline on ArogyaAI · ABHA ID: XXXX-1234</div></div>
 <div class="grid-cols">
   <div class="card">
     <div class="card-title">Consultation Timeline</div>
     <div class="timeline">
-      ${[
-        ['Jun 5','🩺','Tele-consult · Dr. Priya Sharma','Acute URI · Prescribed Azithromycin 500mg','var(--teal-light)'],
-        ['May 28','📄','Chest X-ray uploaded','Radiology report reviewed — No acute findings','var(--blue-light)'],
-        ['May 12','🩺','Tele-consult · Dr. Priya Sharma','Viral fever · Prescribed Paracetamol + Cetirizine','var(--teal-light)'],
-        ['Apr 30','🤖','AI Consultation','Symptom assessment: Seasonal allergy recommended ENT','var(--purple-light)'],
-        ['Apr 18','🧪','CBC Blood Test booked','Results: Normal. Hemoglobin 14.2 g/dL','var(--amber-light)'],
-        ['Mar 22','🩺','In-person · Dr. Priya Sharma','Annual checkup · BP slightly elevated (128/84)','var(--teal-light)'],
-      ].map(([d,ic,t,s,bg])=>`
+      ${[[`Jun 5`,`🩺`,`Tele-consult · Dr. Priya Sharma`,`Acute URI · Prescribed Azithromycin 500mg`,`var(--teal-light)`],[`May 28`,`📄`,`Chest X-ray uploaded`,`Radiology report reviewed — No acute findings`,`var(--blue-light)`],[`May 12`,`🩺`,`Tele-consult · Dr. Priya Sharma`,`Viral fever · Prescribed Paracetamol + Cetirizine`,`var(--teal-light)`],[`Apr 30`,`🤖`,`AI Consultation`,`Symptom assessment: Seasonal allergy recommended ENT`,`var(--purple-light)`],[`Apr 18`,`🧪`,`CBC Blood Test booked`,`Results: Normal. Hemoglobin 14.2 g/dL`,`var(--amber-light)`],[`Mar 22`,`🩺`,`In-person · Dr. Priya Sharma`,`Annual checkup · BP slightly elevated (128/84)`,`var(--teal-light)`]].map(([d,ic,t,s,bg])=>`
         <div class="timeline-item">
           <div class="timeline-dot" style="background:${bg}">${ic}</div>
           <div class="timeline-content">
@@ -1324,7 +691,7 @@ function patientHistory() {
             <div style="font-size:12px;color:var(--text2);margin-top:2px">${s}</div>
             <div class="timeline-time">${d}, 2026</div>
           </div>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
   </div>
   <div>
@@ -1340,18 +707,15 @@ function patientHistory() {
     </div>
     <div class="card">
       <div class="card-title">Vaccination Record</div>
-      ${[['COVID-19 (Covaxin)','Both doses','2021'],['Influenza','Annual','2025'],['Hepatitis B','Full course','2018']].map(([v,d,y])=>`
+      ${[[`COVID-19 (Covaxin)`,`Both doses`,`2021`],[`Influenza`,`Annual`,`2025`],[`Hepatitis B`,`Full course`,`2018`]].map(([v,d,y])=>`
         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
           <span>${v}</span><span style="color:var(--text2)">${d} · ${y}</span><span class="badge badge-green" style="font-size:10px">✓</span>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
   </div>
-</div>`;
-}
-
+</div>`}
 // ===== TELE CONSULT =====
-function teleconsult() {
-  return `
+function teleconsult(){return`
 <div class="page-header"><div class="page-title">Tele-Consultation</div><div class="page-sub">Secure video consultation · End-to-end encrypted</div></div>
 <div class="grid-cols">
   <div>
@@ -1362,10 +726,10 @@ function teleconsult() {
       </div>
       <div class="video-card">
         <div style="text-align:center">
-          <div class="video-avatar">${currentRole === 'doctor' ? 'RK' : 'Dr'}</div>
-          <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:8px">${currentRole === 'doctor' ? 'Rahul Kumar' : 'Dr. Priya Sharma'}</div>
+          <div class="video-avatar">${currentRole===`doctor`?`RK`:`Dr`}</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:8px">${currentRole===`doctor`?`Rahul Kumar`:`Dr. Priya Sharma`}</div>
         </div>
-        <div class="video-label">${currentRole === 'doctor' ? 'Patient · Rahul Kumar' : 'Dr. Priya Sharma · Gen. Medicine'}</div>
+        <div class="video-label">${currentRole===`doctor`?`Patient · Rahul Kumar`:`Dr. Priya Sharma · Gen. Medicine`}</div>
       </div>
       <div class="video-controls">
         <button class="video-ctrl video-ctrl-default" title="Mute">🎤</button>
@@ -1379,14 +743,14 @@ function teleconsult() {
       <div class="card-title">Consultation Notes</div>
       <textarea class="form-input form-textarea" placeholder="Type consultation notes here..." style="min-height:100px"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px">
-        ${currentRole === 'doctor' ? `<button class="btn btn-primary btn-sm" onclick="navigate('doctor-prescriptions')">Write Prescription</button>` : ''}
+        ${currentRole===`doctor`?`<button class="btn btn-primary btn-sm" onclick="navigate('doctor-prescriptions')">Write Prescription</button>`:``}
         <button class="btn btn-secondary btn-sm">Share Screen</button>
       </div>
     </div>
   </div>
   <div>
     <div class="card" style="margin-bottom:16px">
-      <div class="card-title">${currentRole === 'doctor' ? 'Patient Details' : 'My Details'}</div>
+      <div class="card-title">${currentRole===`doctor`?`Patient Details`:`My Details`}</div>
       <div style="font-size:13px;">
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Name</span><span style="font-weight:500">Rahul Kumar</span></div>
         <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Age</span><span>34 years, Male</span></div>
@@ -1397,223 +761,111 @@ function teleconsult() {
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">Uploaded Reports</div>
-      ${[['CBC_Report_Jun5.pdf','Lab Report'],['Skin_Photo.jpg','Disease Image']].map(([f,t])=>`
+      ${[[`CBC_Report_Jun5.pdf`,`Lab Report`],[`Skin_Photo.jpg`,`Disease Image`]].map(([f,t])=>`
         <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
-          <span>${f.endsWith('.pdf')?'📄':'🖼️'}</span>
+          <span>${f.endsWith(`.pdf`)?`📄`:`🖼️`}</span>
           <div style="flex:1;font-size:13px">${f}<div style="font-size:11px;color:var(--text3)">${t}</div></div>
           <button class="btn btn-secondary btn-sm">View</button>
-        </div>`).join('')}
+        </div>`).join(``)}
     </div>
-    ${currentRole === 'doctor' ? `
+    ${currentRole===`doctor`?`
     <div class="card">
       <div class="card-title">Quick Prescription</div>
       <div class="form-group"><label class="form-label">Diagnosis</label><input class="form-input" placeholder="Enter diagnosis"></div>
       <div class="form-group"><label class="form-label">Medicine</label><input class="form-input" placeholder="Drug name + dose"></div>
       <button class="btn btn-primary">Send Prescription</button>
-    </div>` : ''}
+    </div>`:``}
   </div>
-</div>`;
-}
-
+</div>`}
 // ===== INIT FUNCTIONS =====
-function initChat() {
-  const input = document.getElementById('chat-input');
-  if (input) {
-    input.addEventListener('input', function() {
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-    });
-  }
-}
-
-function initUpload() {
-  const zone = document.getElementById('drop-zone');
-  if (zone) {
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
-    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleReportUpload({ target: { files: e.dataTransfer.files }}); });
-  }
-}
-
-function initTeleconsult() {}
-
+function initChat(){let input=document.getElementById(`chat-input`);input&&input.addEventListener(`input`,function(){this.style.height=`auto`,this.style.height=Math.min(this.scrollHeight,100)+`px`})}function initUpload(){let zone=document.getElementById(`drop-zone`);zone&&(zone.addEventListener(`dragover`,e=>{e.preventDefault(),zone.classList.add(`drag`)}),zone.addEventListener(`dragleave`,()=>zone.classList.remove(`drag`)),zone.addEventListener(`drop`,e=>{e.preventDefault(),zone.classList.remove(`drag`),handleReportUpload({target:{files:e.dataTransfer.files}})}))}function initTeleconsult(){}
 // ===== AI CHAT =====
-const aiResponses = {
-  default: [
-    "Based on your symptoms, this could be related to a **viral upper respiratory infection**, which is very common in Chennai this time of year.\n\n**Immediate steps:**\n• Stay hydrated with warm water and ORS\n• Rest adequately\n• Monitor your temperature every 4-6 hours\n\n**When to see a doctor immediately:**\n• If temperature exceeds 103°F\n• Difficulty breathing\n• Chest tightness\n\nWould you like me to book you an appointment with Dr. Priya Sharma? She has slots available today.",
-    "I can see from your health records that your blood pressure was 128/84 at your last visit. **Your symptoms are noted.**\n\nFor a proper diagnosis, I recommend:\n1. **Tele-consult** with Dr. Priya Sharma (available now)\n2. Mention your current medications\n3. Bring up your BP readings\n\nShall I book an urgent appointment?",
-    "Thank you for sharing those details. Based on what you've described, the most likely cause is **seasonal allergic reaction**, given Chennai's current weather patterns.\n\n**Recommended actions:**\n• Antihistamine (Cetirizine 10mg at bedtime)\n• Avoid dust and pollen\n• Nasal saline rinse\n\nHowever, since you mentioned this has been ongoing for more than 3 days, I'd recommend a consultation with Dr. Kavya Nair (Dermatology) if there's a skin component, or Dr. Priya Sharma for general assessment.",
-  ],
-  fever: "I see you've had a fever for 2 days. Let me assess this:\n\n**Current concern level:** 🟡 Moderate\n\n**Key questions to assess:**\n1. What's your current temperature?\n2. Any body aches or chills?\n3. Sore throat or cough?\n\nFor fever management right now:\n- Paracetamol 650mg every 6 hours (since you have no Paracetamol allergy in your records)\n- Cool compress\n- Rest and fluids\n\n**I recommend booking a tele-consult** if fever persists beyond 24 hours or exceeds 102°F. Shall I book Dr. Priya Sharma?",
-  rash: "Skin rashes can have many causes. To help you better, please **upload a clear photo** of the affected area using the 📎 button.\n\nIn the meantime:\n- Do not scratch the area\n- Avoid applying random creams\n- Note if there's any itching, burning, or spreading\n\nDr. Kavya Nair (Dermatology) has an opening today and is excellent with skin conditions.",
-  chest: "⚠️ **Chest pain requires immediate attention.** I'm taking this seriously.\n\nIf you are experiencing:\n- **Severe crushing chest pain** spreading to the arm or jaw\n- **Difficulty breathing**\n- **Sweating with chest pain**\n\n→ **Call 108 (Emergency) immediately.**\n\nIf it's mild discomfort, let me connect you to Dr. Arun Mehta (Cardiology) urgently. He has an emergency slot available. Shall I book it now?",
-  diabetes: "Managing diabetes effectively is very important. From your health records, your last blood sugar reading was 98 mg/dL (fasting) — that's in the normal range.\n\nFor ongoing diabetes management:\n1. Dr. Priya Sharma offers chronic care plans on ArogyaAI\n2. Regular HbA1c monitoring every 3 months\n3. Blood sugar tracking\n\nWould you like to enroll in our **ArogyaAI Diabetes Care Program**?",
-};
+const aiResponses={default:[`Based on your symptoms, this could be related to a **viral upper respiratory infection**, which is very common in Chennai this time of year.
 
-function quickSend(text) {
-  document.getElementById('chat-input').value = text;
-  sendChat();
-}
+**Immediate steps:**
+• Stay hydrated with warm water and ORS
+• Rest adequately
+• Monitor your temperature every 4-6 hours
 
-function handleChatKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-}
+**When to see a doctor immediately:**
+• If temperature exceeds 103°F
+• Difficulty breathing
+• Chest tightness
 
-async function sendChat() {
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  input.style.height = 'auto';
-  addMsg(text, 'user');
-  showTyping();
+Would you like me to book you an appointment with Dr. Priya Sharma? She has slots available today.`,`I can see from your health records that your blood pressure was 128/84 at your last visit. **Your symptoms are noted.**
 
-  // Try backend proxy first (handles auth + logging), fallback to direct
-  if (AROGYAAI.isLoggedIn()) {
-    try {
-      const r = await AROGYAAI.aiChat(text, 'English', chatHistory.slice(-6));
-      removeTyping();
-      if (r.ok) { addMsg(r.data.reply, 'ai'); chatHistory.push({role:'user',content:text},{role:'assistant',content:r.data.reply}); return; }
-    } catch(e) { /* fallback below */ }
-  }
+For a proper diagnosis, I recommend:
+1. **Tele-consult** with Dr. Priya Sharma (available now)
+2. Mention your current medications
+3. Bring up your BP readings
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: `You are ArogyaAI, an intelligent health assistant built for Indian patients. You speak in a warm, empathetic tone. You help with: symptom assessment, health advice, recommending the right specialist, and helping book appointments. Patient profile: Name: Rahul Kumar, Age: 34, City: Chennai, India. Known conditions: mild hypertension (borderline). Known allergy: Penicillin. Always:
+Shall I book an urgent appointment?`,`Thank you for sharing those details. Based on what you've described, the most likely cause is **seasonal allergic reaction**, given Chennai's current weather patterns.
+
+**Recommended actions:**
+• Antihistamine (Cetirizine 10mg at bedtime)
+• Avoid dust and pollen
+• Nasal saline rinse
+
+However, since you mentioned this has been ongoing for more than 3 days, I'd recommend a consultation with Dr. Kavya Nair (Dermatology) if there's a skin component, or Dr. Priya Sharma for general assessment.`],fever:`I see you've had a fever for 2 days. Let me assess this:
+
+**Current concern level:** 🟡 Moderate
+
+**Key questions to assess:**
+1. What's your current temperature?
+2. Any body aches or chills?
+3. Sore throat or cough?
+
+For fever management right now:
+- Paracetamol 650mg every 6 hours (since you have no Paracetamol allergy in your records)
+- Cool compress
+- Rest and fluids
+
+**I recommend booking a tele-consult** if fever persists beyond 24 hours or exceeds 102°F. Shall I book Dr. Priya Sharma?`,rash:`Skin rashes can have many causes. To help you better, please **upload a clear photo** of the affected area using the 📎 button.
+
+In the meantime:
+- Do not scratch the area
+- Avoid applying random creams
+- Note if there's any itching, burning, or spreading
+
+Dr. Kavya Nair (Dermatology) has an opening today and is excellent with skin conditions.`,chest:`⚠️ **Chest pain requires immediate attention.** I'm taking this seriously.
+
+If you are experiencing:
+- **Severe crushing chest pain** spreading to the arm or jaw
+- **Difficulty breathing**
+- **Sweating with chest pain**
+
+→ **Call 108 (Emergency) immediately.**
+
+If it's mild discomfort, let me connect you to Dr. Arun Mehta (Cardiology) urgently. He has an emergency slot available. Shall I book it now?`,diabetes:`Managing diabetes effectively is very important. From your health records, your last blood sugar reading was 98 mg/dL (fasting) — that's in the normal range.
+
+For ongoing diabetes management:
+1. Dr. Priya Sharma offers chronic care plans on ArogyaAI
+2. Regular HbA1c monitoring every 3 months
+3. Blood sugar tracking
+
+Would you like to enroll in our **ArogyaAI Diabetes Care Program**?`};function quickSend(text){document.getElementById(`chat-input`).value=text,sendChat()}function handleChatKey(e){e.key===`Enter`&&!e.shiftKey&&(e.preventDefault(),sendChat())}async function sendChat(){let input=document.getElementById(`chat-input`),text=input.value.trim();if(text){
+// Try backend proxy first (handles auth + logging), fallback to direct
+if(input.value=``,input.style.height=`auto`,addMsg(text,`user`),showTyping(),AROGYAAI.isLoggedIn())try{let r=await AROGYAAI.aiChatCached(text,`English`,chatHistory.slice(-6));if(removeTyping(),r.ok){addMsg(r.data.reply,`ai`),chatHistory.push({role:`user`,content:text},{role:`assistant`,content:r.data.reply});return}}catch{}try{let response=await fetch(`https://api.anthropic.com/v1/messages`,{method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify({model:`claude-sonnet-4-20250514`,max_tokens:1e3,system:`You are ArogyaAI, an intelligent health assistant built for Indian patients. You speak in a warm, empathetic tone. You help with: symptom assessment, health advice, recommending the right specialist, and helping book appointments. Patient profile: Name: Rahul Kumar, Age: 34, City: Chennai, India. Known conditions: mild hypertension (borderline). Known allergy: Penicillin. Always:
 1. Be empathetic and clear
 2. Give practical Indian-context advice
 3. Suggest doctor names from: Dr. Priya Sharma (Gen. Medicine), Dr. Arun Mehta (Cardiology), Dr. Kavya Nair (Dermatology), Dr. Raj Singh (Pediatrics)
 4. Always add disclaimer: "This is AI guidance, not a medical diagnosis. Please consult a doctor."
 5. Use bullet points for clarity
 6. Mention emergency numbers (108) when symptoms are serious
-7. Keep responses concise but thorough`,
-        messages: [{ role: 'user', content: text }]
-      })
-    });
-
-    removeTyping();
-    if (response.ok) {
-      const data = await response.json();
-      const reply = data.content[0].text;
-      addMsg(reply, 'ai');
-    } else {
-      const lc = text.toLowerCase();
-      let reply = aiResponses.default[Math.floor(Math.random()*3)];
-      if (lc.includes('fever')) reply = aiResponses.fever;
-      else if (lc.includes('rash') || lc.includes('skin')) reply = aiResponses.rash;
-      else if (lc.includes('chest')) reply = aiResponses.chest;
-      else if (lc.includes('diabetes') || lc.includes('sugar')) reply = aiResponses.diabetes;
-      addMsg(reply, 'ai');
-    }
-  } catch(e) {
-    removeTyping();
-    const lc = text.toLowerCase();
-    let reply = aiResponses.default[Math.floor(Math.random()*3)];
-    if (lc.includes('fever')) reply = aiResponses.fever;
-    else if (lc.includes('rash') || lc.includes('skin')) reply = aiResponses.rash;
-    else if (lc.includes('chest')) reply = aiResponses.chest;
-    else if (lc.includes('diabetes') || lc.includes('sugar')) reply = aiResponses.diabetes;
-    addMsg(reply, 'ai');
-  }
-}
-
-function addMsg(text, role) {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = `chat-msg ${role}`;
-  const formatted = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  if (role === 'ai') {
-    div.innerHTML = `<div class="chat-ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73A2 2 0 0110 4a2 2 0 012-2z" fill="white"/></svg></div><div class="chat-bubble">${formatted}</div>`;
-  } else {
-    div.innerHTML = `<div class="chat-bubble">${formatted}</div>`;
-  }
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-
-function showTyping() {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'chat-msg ai'; div.id = 'typing-indicator';
-  div.innerHTML = `<div class="chat-ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73A2 2 0 0110 4a2 2 0 012-2z" fill="white"/></svg></div><div class="chat-bubble chat-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-}
-
-function removeTyping() {
-  const el = document.getElementById('typing-indicator');
-  if (el) el.remove();
-}
-
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const msgs = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'chat-msg user';
-  div.innerHTML = `<div class="chat-bubble">📎 Uploaded: <strong>${file.name}</strong></div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  showTyping();
-  setTimeout(() => {
-    removeTyping();
-    addMsg(`I've received your file **${file.name}**. 📋\n\nI'm analyzing the content. For medical images and reports, Dr. Priya Sharma will be notified and will review it within 2-4 hours.\n\nWould you like me to:\n1. Book an urgent consultation to discuss the report?\n2. Add this to your health records?`, 'ai');
-  }, 1800);
-}
-
+7. Keep responses concise but thorough`,messages:[{role:`user`,content:text}]})});if(removeTyping(),response.ok){let reply=(await response.json()).content[0].text;addMsg(reply,`ai`)}else{let lc=text.toLowerCase(),reply=aiResponses.default[Math.floor(Math.random()*3)];lc.includes(`fever`)?reply=aiResponses.fever:lc.includes(`rash`)||lc.includes(`skin`)?reply=aiResponses.rash:lc.includes(`chest`)?reply=aiResponses.chest:(lc.includes(`diabetes`)||lc.includes(`sugar`))&&(reply=aiResponses.diabetes),addMsg(reply,`ai`)}}catch{removeTyping();let lc=text.toLowerCase(),reply=aiResponses.default[Math.floor(Math.random()*3)];lc.includes(`fever`)?reply=aiResponses.fever:lc.includes(`rash`)||lc.includes(`skin`)?reply=aiResponses.rash:lc.includes(`chest`)?reply=aiResponses.chest:(lc.includes(`diabetes`)||lc.includes(`sugar`))&&(reply=aiResponses.diabetes),addMsg(reply,`ai`)}}}function addMsg(text,role){let container=document.getElementById(`chat-messages`),div=document.createElement(`div`);div.className=`chat-msg ${role}`;let formatted=text.replace(/\*\*(.*?)\*\*/g,`<strong>$1</strong>`).replace(/\n/g,`<br>`);role===`ai`?div.innerHTML=`<div class="chat-ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73A2 2 0 0110 4a2 2 0 012-2z" fill="white"/></svg></div><div class="chat-bubble">${formatted}</div>`:div.innerHTML=`<div class="chat-bubble">${formatted}</div>`,container.appendChild(div),container.scrollTop=container.scrollHeight}function showTyping(){let container=document.getElementById(`chat-messages`),div=document.createElement(`div`);div.className=`chat-msg ai`,div.id=`typing-indicator`,div.innerHTML=`<div class="chat-ai-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73A2 2 0 0110 4a2 2 0 012-2z" fill="white"/></svg></div><div class="chat-bubble chat-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`,container.appendChild(div),container.scrollTop=container.scrollHeight}function removeTyping(){let el=document.getElementById(`typing-indicator`);el&&el.remove()}function handleFileUpload(event){let file=event.target.files[0];if(!file)return;let msgs=document.getElementById(`chat-messages`),div=document.createElement(`div`);div.className=`chat-msg user`,div.innerHTML=`<div class="chat-bubble">📎 Uploaded: <strong>${file.name}</strong></div>`,msgs.appendChild(div),msgs.scrollTop=msgs.scrollHeight,showTyping(),setTimeout(()=>{removeTyping(),addMsg(`I've received your file **${file.name}**. 📋\n\nI'm analyzing the content. For medical images and reports, Dr. Priya Sharma will be notified and will review it within 2-4 hours.\n\nWould you like me to:\n1. Book an urgent consultation to discuss the report?\n2. Add this to your health records?`,`ai`)},1800)}
 // ===== REPORT UPLOAD =====
-function handleReportUpload(event) {
-  const files = Array.from(event.target.files || []);
-  const list = document.getElementById('report-file-list');
-  const btn = document.getElementById('upload-submit-btn');
-  if (!list) return;
-  files.forEach(f => {
-    const item = document.createElement('div');
-    item.className = 'file-item';
-    item.innerHTML = `<span class="file-item-icon">${f.name.endsWith('.pdf')?'📄':'🖼️'}</span><span class="file-item-name">${f.name}</span><span class="file-item-size">${(f.size/1024).toFixed(0)} KB</span><span class="badge badge-teal">Ready</span>`;
-    list.appendChild(item);
-  });
-  if (btn) btn.style.display = 'inline-flex';
-}
-
-function submitUpload() {
-  const list = document.getElementById('report-file-list');
-  const btn = document.getElementById('upload-submit-btn');
-  if (list) list.innerHTML = '<div style="padding:12px;text-align:center;color:var(--teal);font-size:13px">✅ Reports uploaded successfully! Your doctor will be notified.</div>';
-  if (btn) btn.style.display = 'none';
-}
-
+function handleReportUpload(event){let files=Array.from(event.target.files||[]),list=document.getElementById(`report-file-list`),btn=document.getElementById(`upload-submit-btn`);list&&(files.forEach(f=>{let item=document.createElement(`div`);item.className=`file-item`,item.innerHTML=`<span class="file-item-icon">${f.name.endsWith(`.pdf`)?`📄`:`🖼️`}</span><span class="file-item-name">${f.name}</span><span class="file-item-size">${(f.size/1024).toFixed(0)} KB</span><span class="badge badge-teal">Ready</span>`,list.appendChild(item)}),btn&&(btn.style.display=`inline-flex`))}function submitUpload(){let list=document.getElementById(`report-file-list`),btn=document.getElementById(`upload-submit-btn`);list&&(list.innerHTML=`<div style="padding:12px;text-align:center;color:var(--teal);font-size:13px">✅ Reports uploaded successfully! Your doctor will be notified.</div>`),btn&&(btn.style.display=`none`)}
 // ===== ADMIN CHART INIT =====
-function renderAdminChart() {
-  const chart = document.getElementById('admin-chart');
-  if (!chart) return;
-  const data = [[62,38,18],[84,52,24],[71,44,21],[93,61,28],[88,55,32],[54,32,15],[48,28,12]];
-  chart.innerHTML = data.map(([t,a,i])=>`
+function renderAdminChart(){let chart=document.getElementById(`admin-chart`);chart&&(chart.innerHTML=[[62,38,18],[84,52,24],[71,44,21],[93,61,28],[88,55,32],[54,32,15],[48,28,12]].map(([t,a,i])=>`
     <div class="chart-bar-wrap">
       <div style="display:flex;gap:2px;align-items:flex-end;height:100px">
         <div class="chart-bar-col" style="background:var(--teal);height:${t}px" title="Tele: ${t}"></div>
         <div class="chart-bar-col" style="background:var(--blue);height:${a}px" title="AI: ${a}"></div>
         <div class="chart-bar-col" style="background:var(--purple);height:${i}px" title="In-person: ${i}"></div>
       </div>
-    </div>`).join('');
-}
-
+    </div>`).join(``))}
 // ===== MODALS =====
-function openModal(html) {
-  document.getElementById('modal-content').innerHTML = html;
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(e) {
-  if (e.target === document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open');
-}
-
-function openPrescModal(patient) {
-  openModal(`
+function openModal(html){document.getElementById(`modal-content`).innerHTML=html,document.getElementById(`modal-overlay`).classList.add(`open`)}function closeModal(e){e.target===document.getElementById(`modal-overlay`)&&document.getElementById(`modal-overlay`).classList.remove(`open`)}function openPrescModal(patient){openModal(`
     <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
     <div class="modal-title">Write Prescription</div>
     <div class="modal-sub">Patient: <strong>${patient}</strong></div>
@@ -1627,60 +879,22 @@ function openPrescModal(patient) {
     <div class="form-group"><label class="form-label">Instructions</label><textarea class="form-input form-textarea" placeholder="Take after food..."></textarea></div>
     <div class="form-group"><label class="form-label">Follow-up date</label><input type="date" class="form-input"></div>
     <button class="btn btn-primary" onclick="issuePrescription('${patient}')">Issue Prescription</button>
-  `);
-}
-
-function addModalDrug() {
-  const list = document.getElementById('modal-drugs');
-  const row = document.createElement('div');
-  row.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:8px';
-  row.innerHTML = `<input class="form-input" placeholder="Drug name"><input class="form-input" placeholder="Dose"><input class="form-input" placeholder="Duration">`;
-  list.appendChild(row);
-}
-
-async function issuePrescription(patient) {
-  // Try real API
-  if (AROGYAAI.isLoggedIn()) {
-    const r = await AROGYAAI.issuePrescription({
-      patient_id: patient,
-      diagnosis: document.querySelector('#modal-content input')?.value || 'Consultation',
-      medicines: [{ name: 'As prescribed', dose: 'As directed', frequency: 'TID', duration: '5 days' }],
-      instructions: document.querySelector('#modal-content textarea')?.value || ''
-    });
-    if (!r.ok) console.warn('Prescription API:', r.error);
-  }
-  document.getElementById('modal-overlay').classList.remove('open');
-  setTimeout(() => {
-    openModal(`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">✅</div><div class="modal-title">Prescription Issued!</div><p style="margin-top:8px">Prescription for <strong>${patient}</strong> has been sent to the patient's ArogyaAI portal. They will receive a WhatsApp notification.</p><button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Done</button></div>`);
-  }, 100);
-}
-
-function openBookModal(doctor) {
-  openModal(`
+  `)}function addModalDrug(){let list=document.getElementById(`modal-drugs`),row=document.createElement(`div`);row.style.cssText=`display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:8px`,row.innerHTML=`<input class="form-input" placeholder="Drug name"><input class="form-input" placeholder="Dose"><input class="form-input" placeholder="Duration">`,list.appendChild(row)}async function issuePrescription(patient){
+// Try real API
+if(AROGYAAI.isLoggedIn()){let r=await AROGYAAI.issuePrescription({patient_id:patient,diagnosis:document.querySelector(`#modal-content input`)?.value||`Consultation`,medicines:[{name:`As prescribed`,dose:`As directed`,frequency:`TID`,duration:`5 days`}],instructions:document.querySelector(`#modal-content textarea`)?.value||``});r.ok||console.warn(`Prescription API:`,r.error)}document.getElementById(`modal-overlay`).classList.remove(`open`),setTimeout(()=>{openModal(`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">✅</div><div class="modal-title">Prescription Issued!</div><p style="margin-top:8px">Prescription for <strong>${patient}</strong> has been sent to the patient's ArogyaAI portal. They will receive a WhatsApp notification.</p><button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Done</button></div>`)},100)}function openBookModal(doctor){openModal(`
     <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
     <div class="modal-title">Book Appointment</div>
     <div class="modal-sub">${doctor}</div>
     <div class="form-group"><label class="form-label">Select Date</label><input type="date" class="form-input"></div>
     <div class="form-group"><label class="form-label">Select Time Slot</label>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-        ${['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','2:00 PM'].map(t=>`<button class="btn btn-secondary btn-sm" onclick="this.style.background='var(--teal)';this.style.color='white';document.querySelectorAll('#modal-content .time-slot').forEach(b=>{if(b!==this){b.style.background='';b.style.color=''}}"  class="time-slot">${t}</button>`).join('')}
+        ${[`9:00 AM`,`9:30 AM`,`10:00 AM`,`10:30 AM`,`11:00 AM`,`2:00 PM`].map(t=>`<button class="btn btn-secondary btn-sm" onclick="this.style.background='var(--teal)';this.style.color='white';document.querySelectorAll('#modal-content .time-slot').forEach(b=>{if(b!==this){b.style.background='';b.style.color=''}}"  class="time-slot">${t}</button>`).join(``)}
       </div>
     </div>
     <div class="form-group"><label class="form-label">Reason for visit</label><textarea class="form-input form-textarea" placeholder="Brief description of symptoms..."></textarea></div>
     <div class="form-group"><label class="form-label">Consultation Type</label><select class="form-input"><option>Tele-consultation (₹500)</option><option>In-person (₹800)</option></select></div>
     <button class="btn btn-primary" onclick="confirmBooking('${doctor}')">Confirm & Pay via UPI</button>
-  `);
-}
-
-function confirmBooking(doctor) {
-  document.getElementById('modal-overlay').classList.remove('open');
-  setTimeout(()=>{
-    openModal(`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">🎉</div><div class="modal-title">Appointment Booked!</div><p style="margin-top:8px">Your appointment with <strong>${doctor}</strong> is confirmed. You will receive a WhatsApp confirmation shortly.</p><button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Done</button></div>`);
-  },100);
-}
-
-function showConsultDetail() {
-  openModal(`<button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+  `)}function confirmBooking(doctor){document.getElementById(`modal-overlay`).classList.remove(`open`),setTimeout(()=>{openModal(`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">🎉</div><div class="modal-title">Appointment Booked!</div><p style="margin-top:8px">Your appointment with <strong>${doctor}</strong> is confirmed. You will receive a WhatsApp confirmation shortly.</p><button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Done</button></div>`)},100)}function showConsultDetail(){openModal(`<button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
     <div class="modal-title">Consultation #4821</div>
     <div class="modal-sub">Jun 5, 2026 · Tele-consultation · 16 min</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
@@ -1692,11 +906,7 @@ function showConsultDetail() {
       <div class="rx-drug"><span class="rx-drug-name">Azithromycin 500mg</span><span class="rx-drug-dose">1 tab daily × 5 days</span></div>
       <div class="rx-drug"><span class="rx-drug-name">Paracetamol 650mg</span><span class="rx-drug-dose">SOS every 6 hrs</span></div>
     </div>
-    <button class="btn btn-secondary" style="margin-top:16px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Close</button>`);
-}
-
-function openAddDoctorModal() {
-  openModal(`<button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+    <button class="btn btn-secondary" style="margin-top:16px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Close</button>`)}function openAddDoctorModal(){openModal(`<button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
     <div class="modal-title">Add New Doctor</div>
     <div class="modal-sub">Onboard a verified doctor to ArogyaAI</div>
     <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" placeholder="Dr. First Last"></div>
@@ -1704,61 +914,10 @@ function openAddDoctorModal() {
     <div class="form-group"><label class="form-label">NMC Registration Number</label><input class="form-input" placeholder="NMC-XXXXXXXX"></div>
     <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="Chennai, Mumbai..."></div>
     <div class="form-group"><label class="form-label">Consultation Fee (₹)</label><input class="form-input" type="number" placeholder="500"></div>
-    <button class="btn btn-primary" onclick="document.getElementById('modal-overlay').classList.remove('open')">Send Onboarding Invite</button>`);
-}
-
-function addDrug() {
-  const list = document.getElementById('drug-list');
-  const count = list.children.length + 1;
-  const div = document.createElement('div');
-  div.className = 'form-group';
-  div.innerHTML = `<label class="form-label">Medicine ${count}</label><div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px"><input class="form-input" placeholder="Drug name"><input class="form-input" placeholder="Dose"><input class="form-input" placeholder="Duration"></div>`;
-  list.appendChild(div);
-}
-
-function showPrescSuccess() {
-  openModal(`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">✅</div><div class="modal-title">Prescription Issued!</div><p style="margin-top:8px">The prescription has been sent to the patient's ArogyaAI portal with a WhatsApp notification.</p><button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Done</button></div>`);
-}
-
-function setTab(el, id) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-}
-
-// Observe content for chart render
-const observer = new MutationObserver(() => { if (document.getElementById('admin-chart')) { renderAdminChart(); } });
-observer.observe(document.getElementById('content') || document.body, { childList: true, subtree: true });
-
+    <button class="btn btn-primary" onclick="document.getElementById('modal-overlay').classList.remove('open')">Send Onboarding Invite</button>`)}function addDrug(){let list=document.getElementById(`drug-list`),count=list.children.length+1,div=document.createElement(`div`);div.className=`form-group`,div.innerHTML=`<label class="form-label">Medicine ${count}</label><div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px"><input class="form-input" placeholder="Drug name"><input class="form-input" placeholder="Dose"><input class="form-input" placeholder="Duration"></div>`,list.appendChild(div)}function showPrescSuccess(){openModal(`<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">✅</div><div class="modal-title">Prescription Issued!</div><p style="margin-top:8px">The prescription has been sent to the patient's ArogyaAI portal with a WhatsApp notification.</p><button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('modal-overlay').classList.remove('open')">Done</button></div>`)}function setTab(el,id){document.querySelectorAll(`.tab-btn`).forEach(b=>b.classList.remove(`active`)),el.classList.add(`active`)}
 // ── REAL AUTH CHECK ─────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  const user = AROGYAAI.getUser();
-  if (user) {
-    // Update nav avatar with real user name
-    const avi = document.getElementById('nav-avatar');
-    if (avi && user.name) {
-      avi.textContent = user.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    }
-    // Pre-select role based on user type
-    if (user.role === 'doctor') switchRole('doctor');
-    else if (user.role === 'admin') switchRole('admin');
-  }
-});
-
-function handleLogout() {
-  AROGYAAI.logout();
-}
-
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/arogyaai/sw.js')
-      .then(function(reg) { console.log('ArogyaAI SW ready'); })
-      .catch(function(e) { console.warn('SW not registered:', e); });
-  });
-}
-</script>
-
-</body>
-</html>
+new MutationObserver(()=>{document.getElementById(`admin-chart`)&&renderAdminChart()}).observe(document.getElementById(`content`)||document.body,{childList:!0,subtree:!0}),document.addEventListener(`DOMContentLoaded`,function(){let user=AROGYAAI.getUser();if(user){
+// Update nav avatar with real user name
+let avi=document.getElementById(`nav-avatar`);
+// Pre-select role based on user type
+avi&&user.name&&(avi.textContent=user.name.split(` `).map(w=>w[0]).join(``).substring(0,2).toUpperCase()),user.role===`doctor`?switchRole(`doctor`):user.role===`admin`&&switchRole(`admin`)}});function handleLogout(){AROGYAAI.logout()}</script><script>`serviceWorker`in navigator&&window.addEventListener(`load`,function(){navigator.serviceWorker.register(`/arogyaai/sw.js`).then(function(reg){console.log(`ArogyaAI SW ready`)}).catch(function(e){console.warn(`SW not registered:`,e)})});</script></body></html>
