@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A7B5E">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ArogyaAI">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ArogyaAI — Sign In</title>
@@ -831,7 +840,14 @@ function showSuccess(role, method){
     "<div style='display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px'><span style='color:var(--ink3)'>Signed in via</span><span style='font-weight:600'>" + method + "</span></div>" +
     "<div style='display:flex;justify-content:space-between;font-size:13px'><span style='color:var(--ink3)'>Session</span><span style='color:#2A7A3A;font-weight:600'>✅ Saved (7 days)</span></div>";
   setTimeout(function(){ document.getElementById("prog-fill").style.width="100%"; }, 100);
-  setTimeout(function(){ window.location.href = "dashboard.html"; }, 2200);
+  setTimeout(function(){
+    var prefs = localStorage.getItem('arogyaai_prefs');
+    if (!prefs || !JSON.parse(prefs).onboardingDone) {
+      window.location.href = 'onboarding.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
+  }, 2200);
 }
 
 // ── AUTO LOGIN IF TOKEN EXISTS ───────────────────────
@@ -839,9 +855,23 @@ window.addEventListener("DOMContentLoaded", function(){
   if(AROGYAAI.isLoggedIn()){
     var user = AROGYAAI.getUser();
     showNotif("Already signed in as " + (user && user.name ? user.name : "you") + ". Redirecting...", "success");
-    setTimeout(function(){ window.location.href="dashboard.html"; }, 1500);
+    setTimeout(function(){
+      var prefs = localStorage.getItem('arogyaai_prefs');
+      window.location.href = (!prefs || !JSON.parse(prefs).onboardingDone) ? 'onboarding.html' : 'dashboard.html';
+    }, 1500);
   }
 });
 </script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/arogyaai/sw.js')
+      .then(function(reg) { console.log('ArogyaAI SW ready'); })
+      .catch(function(e) { console.warn('SW not registered:', e); });
+  });
+}
+</script>
+
 </body>
 </html>
