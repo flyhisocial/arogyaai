@@ -281,6 +281,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif}
   .advice-grid{grid-template-columns:1fr}
 }
 </style>
+<script src="api.js"></script>
 </head>
 <body>
 <div class="app">
@@ -659,6 +660,15 @@ CRITICAL RULES:
 6. Keep responses concise — 2-3 short paragraphs max
 7. End with a practical suggestion (book appointment, tele-consult, home remedy)
 8. Never diagnose — always recommend seeing a doctor for serious symptoms`;
+
+  // Use backend proxy if logged in
+  if (AROGYAAI.isLoggedIn()) {
+    try {
+      const r = await AROGYAAI.aiChat(text, lang.name, chatHistory.slice(-4).map(m=>({role:m.r,content:m.t})));
+      removeTyping();
+      if (r.ok) { chatHistory.push({r:'user',t:text},{r:'assistant',t:r.data.reply}); addMsg(r.data.reply,'ai',lang); return; }
+    } catch(e) { /* fallback to direct */ }
+  }
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
