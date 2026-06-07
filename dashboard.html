@@ -353,6 +353,7 @@ const roles = {
       ]},
       { section: 'System', items: [
         { id: 'admin-settings', label: 'Settings', icon: settingsIcon() },
+      { id: 'admin-cash', label: 'Cash & Commission', icon: chartIcon(), badge: '3' },
       ]},
     ]
   },
@@ -455,6 +456,7 @@ function navigate(pageId) {
     'admin-patients': adminPatients,
     'admin-reports': adminReports,
     'admin-settings': adminSettings,
+    'admin-cash': () => { window.location.href='cash-system.html'; return ''; },
     'doctor-dashboard': doctorDashboard,
     'doctor-appointments': doctorAppointments,
     'doctor-teleconsult': teleconsult,
